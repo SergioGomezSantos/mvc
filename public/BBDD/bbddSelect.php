@@ -1,6 +1,6 @@
 <?php
 
-require ('../bbdd.php');
+require ('../../bbdd.php');
 require ('footerBBDD.php');
 
 
@@ -26,4 +26,4 @@ try {
     echo "Error al conectar con la base de datos: " . "<br>" . $e->getMessage();
 }
 
-footerBBDD(['Insert', 'Update', 'Delete']);
+footerBBDD(['Insert', 'Update', 'Delete'], true);

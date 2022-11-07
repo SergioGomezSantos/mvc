@@ -1,6 +1,6 @@
 <?php
 
-require ('../bbdd.php');
+require ('../../bbdd.php');
 require ('footerBBDD.php');
 
 try {
