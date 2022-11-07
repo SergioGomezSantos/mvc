@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="css/index.css">
-    <title>MVC</title>
+    <title>MVC - Teoría</title>
 </head>
 
 <body>
 
     <header>
-        <h1>MVC</h1>
+        <h1>MVC - Teoría</h1>
         <hr>
     </header>
 
