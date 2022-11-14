@@ -4,7 +4,7 @@ function redirectShow()
 {
     echo "
         <div>
-            <a href='index.php?method=show'>Show</a>
+            <a href='Product/Show'>Show</a>
         </div>
     ";
 }
@@ -13,7 +13,7 @@ function redirectHome()
 {
     echo "
         <div>
-            <a href='index.php'>Home</a>
+            <a href='/Product'>Home</a>
         </div>
     ";
 }

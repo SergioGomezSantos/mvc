@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css">
     <title>Show Product</title>
 </head>
 
@@ -44,9 +44,9 @@
         <?php 
 
             if ($product) {
-                echo '<a href="index.php?method=show&id=' . ($_GET['id'] + 1) . '">Siguiente Producto</a>';
+                echo '<a href="/Product/Show/' . (substr($_GET["url"], -1) + 1) . '">Siguiente Producto</a>';
             } else {
-                echo '<a href="index.php?method=show&id=1">Pasar al primer Producto</a>';
+                echo '<a href="/Product/Show/1">Primer Producto</a>';
             }
         ?>
     </div>

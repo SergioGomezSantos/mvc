@@ -27,7 +27,7 @@
                 echo "<tr>";
                 echo "<td>$product[0]</td>";
                 echo "<td>$product[1]</td>";
-                echo "<td><a href='index.php?method=show&id=$product[0]'>Detalles</a></td>";
+                echo "<td><a href='/Product/Show/$product[0]'>Detalles</a></td>";
                 echo "</tr>";
             }
             ?>

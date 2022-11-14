@@ -1,6 +1,6 @@
 <?php
 
-require "Product.php";
+require "../models/Product.php";
 
 class Controller
 {
@@ -12,13 +12,13 @@ class Controller
     public function home()
     {
         $products = Product::all();
-        require "views/home.php";
+        require "../views/home.php";
     }
     
     public function show()
     {
         $id = $_GET['id'];
         $product = Product::find($id);
-        require "views/show.php";
+        require "../views/show.php";
     }
 }
