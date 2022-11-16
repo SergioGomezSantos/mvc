@@ -9,6 +9,13 @@ class AgendaModel
     public function checkBBDD()
     {
         require "../bbdd.php";
+        $bd = new PDO($access["dsn"], $access["userName"], $access["password"]);
+        $sql = "SHOW TABLES";
+        $dbResponse = $bd->query($sql);
+        $tables = $dbResponse->fetchAll(); // Añadir tabla a mano y comprobar si fecth / fetch all
+
+        var_dump($tables);
+        return $tables;
     }
 
     public function checkInsertBBDD($type, $name, $surnames, $address, $phone)

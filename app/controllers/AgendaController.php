@@ -1,5 +1,7 @@
 <?php
 
+require "../app/models/AgendaModel.php";
+
 class AgendaController {
 
     const ERROR_INFO = "Todos los campos son necesarios";
@@ -13,6 +15,9 @@ class AgendaController {
 
     public function index()
     {
+        $agendaModel = new AgendaModel();
+        $exist = $agendaModel->checkBBDD();
+
         require "../app/views/home.php";
     }
 
@@ -52,7 +57,6 @@ class AgendaController {
 
             if ($type && $name && $surnames && $address && $phone) {
 
-                require "../app/models/AgendaModel.php";
                 $agendaModel = new AgendaModel();
                 $agendaModel->checkInsertBBDD($type, $name, $surnames, $address, $phone);
 
