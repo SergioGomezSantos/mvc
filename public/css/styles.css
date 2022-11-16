@@ -1,0 +1,80 @@
+h1 {
+    text-align: center;
+}
+
+form {
+    width: 320px;
+    margin: 0 auto;
+    position: relative;
+}
+
+#loginUserName {
+    margin-left: 18px;
+}
+
+#loginPassword {
+    margin-left: 5px;
+}
+
+#loginSend {
+    position: absolute;
+    top: 75px;
+    right: 7px;
+}
+
+#divError {
+    margin-top: 50px;
+    color: darkred;
+}
+
+#divOK {
+    margin-top: 50px;
+    color: green;
+}
+
+
+#insertType {
+    margin-left: 168px;
+    margin-bottom: 5px;
+}
+
+#insertName {
+    margin-left: 12px;
+}
+
+#insertSurnames {
+    margin-left: 4px;
+}
+
+#insertPhone {
+    margin-left: 10px;
+}
+
+#insertSend {
+    margin-left: 222px;
+    margin-top: 5px;
+}
+    
+div {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 60%;
+    text-align: center;
+}
+
+li {
+    display: inline-block;
+    list-style: none;
+    padding: 10px;
+}
+
+header {
+    position: relative;
+}
+
+nav {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
