@@ -1,6 +1,9 @@
 <?php
 
+namespace App\Controllers;
+
 require "../app/models/Product.php";
+use App\Models\Product;
 
 class ProductController {
 

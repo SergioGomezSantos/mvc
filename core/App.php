@@ -1,6 +1,13 @@
 <?php
 
-class App {
+namespace Core;
+
+use App\Controllers\HomeController;
+use App\Controllers\LoginController;
+use App\Controllers\ProductController;
+
+class App
+{
 
     function __construct()
     {
@@ -17,19 +24,28 @@ class App {
         if (file_exists($file)) {
 
             require_once "$file";
-
         } else {
 
             http_response_code(404);
             die("Not Found");
         }
 
-        $controllerObject = new $controllerName;
+        switch ($controllerName) {
+
+            case "LoginController":
+                $controllerObject = new LoginController;
+                break;
+            case "ProductController":
+                $controllerObject = new ProductController;
+                break;
+            default:
+                $controllerObject = new HomeController;
+                break;
+        }
 
         if (method_exists($controllerObject, $method)) {
 
             $controllerObject->$method($arguments);
-
         } else {
 
             http_response_code(404);

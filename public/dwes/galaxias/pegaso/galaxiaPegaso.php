@@ -1,12 +1,12 @@
 <?php
 
-namespace Dwes\Galaxias;
+namespace Dwes\Galaxias\Pegaso;
 
-const RADIO = 1.25;
+const RADIO = 3.17;
 
 function observar($mensaje)
 {
-    echo "<br>" . "Observando desde " . $mensaje;
+    echo "<br>" . "Observando Pegaso desde " . $mensaje;
 }
 
 
@@ -20,11 +20,11 @@ class Galaxia
 
     private function nacimiennto()
     {
-        echo "<br>" . "Nacimiento de la galaxia1";
+        echo "<br>" . "Nacimiento de la galaxia Pegaso";
     }
 
     static function muerte()
     {
-        echo "<br>" . "Muerte de la galaxia1";
+        echo "<br>" . "Muerte de la galaxia Pegaso";
     }
 }
