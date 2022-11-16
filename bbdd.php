@@ -1,6 +1,6 @@
 <?php
 
-// https://bcrypt.online/
+const DB_ERROR = "Error al conectar con la base de datos: %s";
 
 $access = [
     "dsn" => "mysql:dbname=agenda;host=db",

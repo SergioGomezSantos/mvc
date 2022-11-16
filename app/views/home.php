@@ -14,8 +14,35 @@
 
     <div>
         <br>
-        <p>Bienvenido, puedes utilizar el menú para desplazarte</p>
+        <? 
+            if ($exist) {
+                echo "<p>La tabla Contactos Trabajo ya existe.</p>";
+            } else {
+                echo "<p>La tabla Contactos Trabajo todavía no existe.</p>";
+            }
+        ?>
     </div>
+
+    <?
+        if ($exist) {
+
+            echo '
+                <form action="/agenda/reset">
+                    <input type="submit" value="Resetear Valores" id="resetTable" />
+                </form>
+            ';
+
+        } else {
+
+            echo '
+                <form action="/agenda/initialize">
+                    <input type="submit" value="Iniciar Tabla" id="initializeTable" />
+                </form>
+            ';
+        }
+    ?>
+
+    <?php require "infoDivs.php" ?>
 </body>
 
 </html>

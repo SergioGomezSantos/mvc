@@ -54,6 +54,14 @@ form {
     margin-left: 222px;
     margin-top: 5px;
 }
+
+#resetTable {
+    margin-left: 80px;
+}
+
+#initializeTable {
+    margin-left: 95px;
+}
     
 div {
     margin-left: auto;

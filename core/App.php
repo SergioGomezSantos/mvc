@@ -1,4 +1,10 @@
 <?php
+
+namespace Core;
+
+use App\Controllers\AgendaController;
+use App\Controllers\LoginController;
+
 session_start();
 
 class App
@@ -36,18 +42,31 @@ class App
                 die("Not Found");
             }
 
-            $controllerObject = new $controllerName;
+
+            switch ($controllerName) {
+
+                case "AgendaController":
+                    $controllerObject = new AgendaController;
+                    break;
+
+                case "LoginController":
+                    $controllerObject = new LoginController;
+                    break;
+
+                default:
+                    http_response_code(404);
+                    die("Controller Not Found");
+                    break;
+            }
 
             if (method_exists($controllerObject, $method)) {
 
                 $controllerObject->$method($arguments);
-                
             } else {
 
                 http_response_code(404);
                 die("Method Not Found");
             }
-            
         } else {
 
             header("Location: /login");

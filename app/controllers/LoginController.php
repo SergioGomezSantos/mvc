@@ -1,4 +1,10 @@
 <?php
+
+namespace App\Controllers;
+
+require "../app/models/LoginModel.php";
+use App\Models\LoginModel;
+
 session_start();
 
 class LoginController
@@ -30,7 +36,6 @@ class LoginController
 
             if ($userName && $password) {
 
-                require "../app/models/LoginModel.php";
                 $loginModel = new LoginModel();
                 $loginModel->checkBBDD($userName, $password);
 

@@ -1,6 +1,9 @@
 <?php
 
+namespace App\Controllers;
+
 require "../app/models/AgendaModel.php";
+use App\Models\AgendaModel;
 
 class AgendaController {
 
@@ -17,8 +20,23 @@ class AgendaController {
     {
         $agendaModel = new AgendaModel();
         $exist = $agendaModel->checkBBDD();
-
         require "../app/views/home.php";
+    }
+
+    public function initialize() {
+
+        $agendaModel = new AgendaModel();
+        $agendaModel->initializeBBDD();
+        header('Location: /');
+        die();
+    }
+
+    public function reset() {
+
+        $agendaModel = new AgendaModel();
+        $agendaModel->resetBBDD();
+        header('Location: /');
+        die();
     }
 
     public function insert()
