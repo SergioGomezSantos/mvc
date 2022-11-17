@@ -55,7 +55,7 @@ form {
 }
 
 #insertSend {
-    margin-left: 222px;
+    margin-left: 214px;
     margin-top: 5px;
 }
 
@@ -72,6 +72,11 @@ form {
 #listContatc {
     display: inline-block;
     margin-left: 5px;
+}
+
+#updateSend {
+    margin-left: 200px;
+    margin-top: 5px;
 }
 
 #resetTable {

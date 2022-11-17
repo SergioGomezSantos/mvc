@@ -15,6 +15,10 @@ class AgendaModel
     const INSERT_ERROR_INFO = "Fallo al insertar la %s: %s";
     const DELETE_OK_INFO = "%s eliminada con éxito";
     const DELETE_ERROR_INFO = "Fallo al eliminar %s";
+    const SEARCH_OK_INFO = "%s encontrada con éxito";
+    const SEARCH_ERROR_INFO = "Fallo al encontrar %s";
+    const UPDATE_OK_INFO = "%s actualizada con éxito";
+    const UPDATE_ERROR_INFO = "Fallo al actualizar %s. Cambia los valores correctamente";
 
     public function __construct()
     {
@@ -216,5 +220,83 @@ class AgendaModel
 
             $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
         }        
+    }
+
+    public function searchBBDD($contactName, $forUpdate = false)
+    {
+        require "../bbdd.php";
+
+        try {
+
+            $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+
+            $sqlSearch = sprintf("SELECT * FROM %s WHERE nombre like '$contactName'", $this::TABLE_NAME);
+            $dbResponseSearch = $bd->query($sqlSearch);
+
+            if ($dbResponseSearch->rowCount() === 1) {
+                
+                $searchContact = $dbResponseSearch->fetch();
+
+                $_SESSION['prevForm']['prevType'] = $searchContact["tipo"];
+                $_SESSION['prevForm']['prevName'] = $searchContact["nombre"];
+                $_SESSION['prevForm']['prevSurnames'] = $searchContact["apellidos"];
+                $_SESSION['prevForm']['prevAddress'] = $searchContact["direccion"];
+                $_SESSION['prevForm']['prevPhone'] = $searchContact["telefono"];
+                $_SESSION['prevForm']['prevEmail'] = $searchContact["email"];
+
+                if (!$forUpdate) {
+                    $_SESSION['ok'] = sprintf($this::SEARCH_OK_INFO, $contactName);
+                }
+
+            } else {
+
+                $_SESSION['error'] = sprintf($this::SEARCH_ERROR_INFO, $contactName);
+
+                if ($forUpdate) {
+
+                    header('Location: /agenda/update');
+                    die();
+
+                } else {
+
+                    header('Location: /agenda/search');
+                    die();
+                }
+            }
+
+        } catch (\PDOException $e) {
+
+            $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+        }      
+    }
+
+    public function updateBBDD($type, $name, $surnames, $address, $phone, $email, $prevName)
+    {
+        require "../bbdd.php";
+
+        try {
+
+            $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+
+            $sqlUpdate = sprintf("UPDATE ContactosTrabajo SET tipo = '$type', nombre = '$name', apellidos ='$surnames', direccion = '$address',
+                                                            telefono = '$phone', email = '$email' WHERE nombre like '$prevName'", $this::TABLE_NAME);
+
+            $dbResponseUpdate = $bd->query($sqlUpdate);
+
+            if ($dbResponseUpdate->rowCount() > 0) {
+
+                $_SESSION['ok'] = sprintf($this::UPDATE_OK_INFO, ucwords($name));
+                return true;
+
+            } else {
+
+                $_SESSION['error'] = sprintf($this::UPDATE_ERROR_INFO, ucwords($name), "");
+                return false;
+            }
+            
+        } catch (\PDOException $e) {
+
+            $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+        }
     }
 }

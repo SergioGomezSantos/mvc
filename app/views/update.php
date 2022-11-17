@@ -10,7 +10,7 @@
     
     <?php require "header.php" ?>
 
-    <form id="listForm" name="form" action="/agenda/checkUpdateSelected" method="POST">
+    <form id="listForm" name="form" action="/agenda/checkUpdate" method="POST">
     
         <br>
         <h3 id="listTitle">Contacto a Actualizar: </h3>
@@ -24,7 +24,7 @@
 
         </select>
 
-        <button type="submit" name="updateSend" id="updateSend" value="updateSend">Actualizar</button>
+        <button type="submit" name="updateSend" id="oneLineSend" value="updateSend">Actualizar</button>
 
     </form>
 

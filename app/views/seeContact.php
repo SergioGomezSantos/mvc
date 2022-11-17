@@ -5,20 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../css/styles.css">
-    <title>Insert</title>
+    <title>Search</title>
 </head>
 
 <body>
 
     <?php require "header.php" ?>
 
-    <form name="form" action="/agenda/checkInsert" method="POST">
+    <form name="form" action="" method="GET">
 
-        <h3>Crear un Contacto: </h3>
+        <h3>Contacto: </h3>
 
         <? require "basicForm.php" ?>
 
-        <button type="submit" name="send" id="insertSend" value="send">Insertar</button>
     </form>
 
     <? 

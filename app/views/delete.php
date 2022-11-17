@@ -24,7 +24,7 @@
 
         </select>
 
-        <button type="submit" name="deleteSend" id="deleteSend" value="deleteSend">Eliminar</button>
+        <button type="submit" name="deleteSend" id="oneLineSend" value="deleteSend">Eliminar</button>
 
     </form>
 
