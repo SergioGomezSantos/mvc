@@ -59,6 +59,21 @@ form {
     margin-top: 5px;
 }
 
+#listForm {
+    width: 480px;
+    margin: 0 auto;
+    position: relative;
+}
+
+#listTitle {
+    display: inline-block;
+}
+
+#listContatc {
+    display: inline-block;
+    margin-left: 5px;
+}
+
 #resetTable {
     margin-left: 80px;
 }

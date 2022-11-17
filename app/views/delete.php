@@ -10,5 +10,27 @@
     
     <?php require "header.php" ?>
 
+    <form id="listForm" name="form" action="/agenda/checkDelete" method="POST">
+    
+        <br>
+        <h3 id="listTitle">Contacto a Eliminar: </h3>
+        <select id="listContatc" name="removeContatc">
+        
+            <?
+                foreach ($contactsName as $contactName) {
+                    echo '<option value=' . $contactName . '>' . $contactName . '</option>';
+                }
+            ?>
+
+        </select>
+
+        <button type="submit" name="deleteSend" id="deleteSend" value="deleteSend">Eliminar</button>
+
+    </form>
+
+    <? 
+        require "infoDivs.php";
+    ?>
+
 </body>
 </html>

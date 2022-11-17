@@ -42,11 +42,8 @@
     </form>
 
     <? 
-
-    require "infoDivs.php";
-
-    unset ($_SESSION['prevForm']);
-
+        require "infoDivs.php";
+        unset ($_SESSION['prevForm']);
     ?>
 
 </body>

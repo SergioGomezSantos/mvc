@@ -7,10 +7,12 @@ use App\Models\AgendaModel;
 
 class AgendaController {
 
-    const ERROR_INFO = "Tipo, nombre, dirección y teléfono son campos necesarios";
+    const ERROR_INSERT_INFO = "Tipo, nombre, dirección y teléfono son campos necesarios";
     const ERROR_PERSONA_INFO = "Persona no puede tener email";
     const ERROR_EMPRESA_INFO = "Empresa no puede tener apellidos";
+    const ERROR_LIST_INFO = "Elige un contacto de la lista";
     const TYPES_ARRAY = array('persona', 'empresa');
+
     private $name;
     private $agendaModel;
 
@@ -105,7 +107,7 @@ class AgendaController {
 
             } else {
 
-                $_SESSION['error'] = $this::ERROR_INFO;
+                $_SESSION['error'] = $this::ERROR_INSERT_INFO;
             }
         }
 
@@ -116,7 +118,27 @@ class AgendaController {
     public function delete()
     {
         $exist = $this->agendaModel->checkBBDD();
+        $contactsName = $this->agendaModel->getContactsNamesList();
         $exist ? require "../app/views/delete.php" : header('Location: /');
+    }
+
+    public function checkDelete()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === "POST" && (isset($_POST['deleteSend']) && !empty($_POST['deleteSend']))) {
+
+            if (isset($_POST['removeContatc']) && !empty($_POST['removeContatc'])) {
+
+                $removeContact = htmlspecialchars($_POST['removeContatc']);
+                $this->agendaModel->deleteBBDD($removeContact);
+
+            } else {
+                
+                $_SESSION['error'] = $this::ERROR_LIST_INFO;
+            }
+        }
+
+        header('Location: /agenda/delete');
+        die();
     }
 
     public function search()
@@ -127,8 +149,49 @@ class AgendaController {
 
     public function update()
     {
+
         $exist = $this->agendaModel->checkBBDD();
-        $exist ? require "../app/views/update.php" : header('Location: /');
+
+        if ($exist) {
+
+            if (isset($_GET['contact']) && !empty($_GET['contact'])) {
+                
+                // $contactInfo = $this->agendaModelSearch();
+                require "../app/views/updateSelected";
+
+            } else {
+
+                $contactsName = $this->agendaModel->getContactsNamesList();
+                require "../app/views/update.php";
+            }
+            
+
+        } else {
+
+            header('Location: /');
+            die();
+        }
+    }
+
+    public function checkUpdateSelected()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === "POST" && (isset($_POST['updateSend']) && !empty($_POST['updateSend']))) {
+
+            if (isset($_POST['updateContatc']) && !empty($_POST['updateContatc'])) {
+
+                $updateContatc = htmlspecialchars($_POST['updateContatc']);
+                // $this->agendaModel->updateBBDD($updateContatc);
+                header('Location: /agenda/update?contact=' . $updateContatc);
+                die();
+
+            } else {
+                
+                $_SESSION['error'] = $this::ERROR_LIST_INFO;
+            }
+        }
+
+        header('Location: /agenda/delete');
+        die();
     }
 
     /**

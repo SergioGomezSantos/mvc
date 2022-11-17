@@ -13,6 +13,8 @@ class AgendaModel
     const RESET_TABLE_ERROR_INFO = "Error al resetear la tabla";
     const INSERT_OK_INFO = "%s insertada con éxito";
     const INSERT_ERROR_INFO = "Fallo al insertar la %s: %s";
+    const DELETE_OK_INFO = "%s eliminada con éxito";
+    const DELETE_ERROR_INFO = "Fallo al eliminar %s";
 
     public function __construct()
     {
@@ -168,5 +170,51 @@ class AgendaModel
 
             $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
         }
+    }
+
+    public function getContactsNamesList() 
+    {
+
+        require "../bbdd.php";
+        $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+        $sql = sprintf("SELECT nombre from %s", $this::TABLE_NAME);
+        $dbResponse = $bd->query($sql);
+
+        $contactsName = [];
+        if ($dbResponse->rowCount() > 0) {
+
+            foreach ($dbResponse as $row) {
+
+                array_push($contactsName, $row["nombre"]);
+            }
+        }
+
+        return $contactsName;
+    }
+
+    public function deleteBBDD($removeContact) {
+
+        require "../bbdd.php";
+
+        try {
+
+            $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+
+            $sqlDelete = sprintf("DELETE FROM %s WHERE nombre like '$removeContact'", $this::TABLE_NAME);
+            $dbResponseDelete = $bd->query($sqlDelete);
+
+            if ($dbResponseDelete->rowCount() > 0) {
+                
+                $_SESSION['ok'] = sprintf($this::DELETE_OK_INFO, $removeContact);
+
+            } else {
+
+                $_SESSION['error'] = sprintf($this::DELETE_ERROR_INFO, $removeContact);
+            }
+
+        } catch (\PDOException $e) {
+
+            $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+        }        
     }
 }
