@@ -34,6 +34,9 @@
         <label for="phone">Teléfono: </label>
         <input type="number" name="phone" id="insertPhone" value="<?= $_SESSION['prevForm']['prevPhone'] ?>" />
         <br>
+        <label for="email">Email: </label>
+        <input type="email" name="email" id="insertEmail" value="<?= $_SESSION['prevForm']['prevEmail'] ?>" />
+        <br>
 
         <button type="submit" name="send" id="insertSend" value="send">Enviar</button>
     </form>

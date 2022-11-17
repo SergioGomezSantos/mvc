@@ -7,7 +7,7 @@ use App\Models\AgendaModel;
 
 class AgendaController {
 
-    const ERROR_INFO = "Todos los campos son necesarios";
+    const ERROR_INFO = "Tipo, nombre, dirección y teléfono son campos necesarios";
     const TYPES_ARRAY = array('persona', 'empresa');
     private $name;
     private $agendaModel;
@@ -73,7 +73,12 @@ class AgendaController {
                 $_SESSION['prevForm']['prevPhone'] = $phone;
             }
 
-            if ($type && $name && $surnames && $address && $phone) {
+            if (isset($_POST['email']) && !empty($_POST['email'])) {
+                $email = htmlspecialchars($_POST['email']);
+                $_SESSION['prevForm']['prevEmail'] = $email;
+            }
+
+            if ($type && $name && $address && $phone) {
 
                 $agendaModel = new AgendaModel();
                 $agendaModel->checkInsertBBDD($type, $name, $surnames, $address, $phone);

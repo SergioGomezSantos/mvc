@@ -50,6 +50,10 @@ form {
     margin-left: 10px;
 }
 
+#insertEmail {
+    margin-left: 32px;
+}
+
 #insertSend {
     margin-left: 222px;
     margin-top: 5px;
