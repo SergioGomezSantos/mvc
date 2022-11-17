@@ -62,8 +62,9 @@ class AgendaModel
 
                 if ($dbResponse->rowCount() === 0) {
 
-                    $_SESSION['ok'] = $this::INITIALIZE_TABLE_OK_INFO;
                     $this->resetBBDD();
+                    $_SESSION['ok'] = $this::INITIALIZE_TABLE_OK_INFO;
+                    
                 } else {
 
                     $_SESSION['error'] = $this::INITIALIZE_TABLE_ERROR_INFO;
@@ -109,10 +110,7 @@ class AgendaModel
                         $phone = $contact->telefono;
                         $email = $contact->email;
 
-                        $sqlInsert = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email) 
-                                VALUES ('$type', '$name', '$surnames', '$address', '$phone', '$email')", $this::TABLE_NAME);
-
-                        $dbResponseInsert = $bd->query($sqlInsert);
+                        $dbResponseInsert = $this->insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email);
                         
                         if (!$dbResponseInsert) {
                             $valid = false;
@@ -139,10 +137,36 @@ class AgendaModel
         header('Location: /');
     }
 
-    public function checkInsertBBDD($type, $name, $surnames, $address, $phone)
+    private function insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email) {
+
+        $sqlInsert = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email) 
+                                VALUES ('$type', '$name', '$surnames', '$address', '$phone', '$email')", $this::TABLE_NAME);
+
+        return $bd->query($sqlInsert);
+    }
+
+    public function checkInsertBBDD($type, $name, $surnames, $address, $phone, $email)
     {
-        // $_SESSION['error'] = sprintf($this::INSERT_ERROR_INFO, ucwords($type), "");
-        $_SESSION['ok'] = sprintf($this::INSERT_OK_INFO, ucwords($type));
-        unset($_SESSION['prevForm']);
+        require "../bbdd.php";
+
+        try {
+
+            $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+            $dbResponseInsert = $this->insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email);
+
+            if ($dbResponseInsert) {
+
+                $_SESSION['ok'] = sprintf($this::INSERT_OK_INFO, ucwords($type));
+                unset($_SESSION['prevForm']);
+
+            } else {
+
+                $_SESSION['error'] = sprintf($this::INSERT_ERROR_INFO, ucwords($type), "");
+            }
+            
+        } catch (\PDOException $e) {
+
+            $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+        }
     }
 }

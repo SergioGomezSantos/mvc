@@ -8,6 +8,8 @@ use App\Models\AgendaModel;
 class AgendaController {
 
     const ERROR_INFO = "Tipo, nombre, dirección y teléfono son campos necesarios";
+    const ERROR_PERSONA_INFO = "Persona no puede tener email";
+    const ERROR_EMPRESA_INFO = "Empresa no puede tener apellidos";
     const TYPES_ARRAY = array('persona', 'empresa');
     private $name;
     private $agendaModel;
@@ -80,8 +82,26 @@ class AgendaController {
 
             if ($type && $name && $address && $phone) {
 
-                $agendaModel = new AgendaModel();
-                $agendaModel->checkInsertBBDD($type, $name, $surnames, $address, $phone);
+                $valid = true;
+
+                if ($type === $this::TYPES_ARRAY[0] && $email) {
+
+                    $_SESSION['error'] = $this::ERROR_PERSONA_INFO;
+                    $valid = false;
+                }
+
+                if ($type === $this::TYPES_ARRAY[1] && $surnames) {
+
+                    $_SESSION['error'] = $this::ERROR_EMPRESA_INFO;
+                    $valid = false;
+                }
+
+                if ($valid) {
+
+                    $agendaModel = new AgendaModel();
+                    $agendaModel->checkInsertBBDD($type, $name, $surnames, $address, $phone, $email);
+                }
+
 
             } else {
 
