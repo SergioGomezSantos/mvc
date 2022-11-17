@@ -10,38 +10,38 @@ class AgendaController {
     const ERROR_INFO = "Todos los campos son necesarios";
     const TYPES_ARRAY = array('persona', 'empresa');
     private $name;
+    private $agendaModel;
 
     function __construct()
     {
         $this->name = "Agenda";
+        $this->agendaModel = new AgendaModel();
     }
 
     public function index()
     {
-        $agendaModel = new AgendaModel();
-        $exist = $agendaModel->checkBBDD();
+        $exist = $this->agendaModel->checkBBDD();
         require "../app/views/home.php";
     }
 
     public function initialize() {
 
-        $agendaModel = new AgendaModel();
-        $agendaModel->initializeBBDD();
+        $this->agendaModel->initializeBBDD();
         header('Location: /');
         die();
     }
 
     public function reset() {
 
-        $agendaModel = new AgendaModel();
-        $agendaModel->resetBBDD();
+        $this->agendaModel->resetBBDD();
         header('Location: /');
         die();
     }
 
     public function insert()
     {
-        require "../app/views/insert.php";
+        $exist = $this->agendaModel->checkBBDD();
+        $exist ? require "../app/views/insert.php" : header('Location: /');
     }
 
     public function checkInsert()
@@ -90,17 +90,20 @@ class AgendaController {
 
     public function delete()
     {
-        require "../app/views/delete.php";
+        $exist = $this->agendaModel->checkBBDD();
+        $exist ? require "../app/views/delete.php" : header('Location: /');
     }
 
     public function search()
     {
-        require "../app/views/search.php";
+        $exist = $this->agendaModel->checkBBDD();
+        $exist ? require "../app/views/search.php" : header('Location: /');
     }
 
     public function update()
     {
-        require "../app/views/update.php";
+        $exist = $this->agendaModel->checkBBDD();
+        $exist ? require "../app/views/update.php" : header('Location: /');
     }
 
     /**

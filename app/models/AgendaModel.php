@@ -53,9 +53,10 @@ class AgendaModel
                 $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
                 $sql = "CREATE TABLE ContactosTrabajo ( tipo varchar(255) NOT NULL, 
                                                           nombre varchar(255) NOT NULL, 
-                                                          apellidos varchar(255) NOT NULL, 
+                                                          apellidos varchar(255) NULL, 
                                                           direccion varchar(255) NOT NULL, 
-                                                          telefono int(11) NOT NULL )
+                                                          telefono int(11) NOT NULL,
+                                                          email varchar(255) NULL )
                                                           ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
                 $dbResponse = $bd->query($sql);
 
@@ -89,13 +90,31 @@ class AgendaModel
 
             try {
 
-                $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
-                $sql = "";
-                $dbResponse = $bd->query($sql);
+                // TODO Borrar datos
 
-                // Leer xml, insertar datos
-                $_SESSION['ok'] = $this::RESET_TABLE_OK_INFO;
-                $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
+                $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+                $xmlData = simplexml_load_file("../documents/agenda.xml");
+                $valid = true;
+
+                foreach ($xmlData->children() as $contact) {
+                    $type = $contact["tipo"];
+                    $name = $contact->nombre;
+                    $surnames = $contact->apellidos;
+                    $address = $contact->direccion;
+                    $phone = $contact->telefono;
+                    $email = $contact->email;
+
+                    $sql = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email) 
+                            VALUES ('$type', '$name', '$surnames', '$address', '$phone', '$email')", $this::TABLE_NAME);
+
+                    $dbResponse = $bd->query($sql);
+                    
+                    if (!$dbResponse) {
+                        $valid = false;
+                    }
+                }
+
+                $valid ? $_SESSION['ok'] = $this::RESET_TABLE_OK_INFO : $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
 
             } catch (\PDOException $e) {
 
