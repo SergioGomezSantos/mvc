@@ -90,28 +90,38 @@ class AgendaModel
 
             try {
 
-                // TODO Borrar datos
-
-                $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
-                $xmlData = simplexml_load_file("../documents/agenda.xml");
                 $valid = true;
+                $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
 
-                foreach ($xmlData->children() as $contact) {
-                    $type = $contact["tipo"];
-                    $name = $contact->nombre;
-                    $surnames = $contact->apellidos;
-                    $address = $contact->direccion;
-                    $phone = $contact->telefono;
-                    $email = $contact->email;
+                $sqlTruncate = sprintf("TRUNCATE TABLE %s", $this::TABLE_NAME);
+                $dbResponseTruncate = $bd->query($sqlTruncate);
 
-                    $sql = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email) 
-                            VALUES ('$type', '$name', '$surnames', '$address', '$phone', '$email')", $this::TABLE_NAME);
-
-                    $dbResponse = $bd->query($sql);
+                if ($dbResponseTruncate) {
                     
-                    if (!$dbResponse) {
-                        $valid = false;
+                    $xmlData = simplexml_load_file("../documents/agenda.xml");
+
+                    foreach ($xmlData->children() as $contact) {
+                        
+                        $type = $contact["tipo"];
+                        $name = $contact->nombre;
+                        $surnames = $contact->apellidos;
+                        $address = $contact->direccion;
+                        $phone = $contact->telefono;
+                        $email = $contact->email;
+
+                        $sqlInsert = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email) 
+                                VALUES ('$type', '$name', '$surnames', '$address', '$phone', '$email')", $this::TABLE_NAME);
+
+                        $dbResponseInsert = $bd->query($sqlInsert);
+                        
+                        if (!$dbResponseInsert) {
+                            $valid = false;
+                        }
                     }
+
+                } else {
+
+                    $valid = false;
                 }
 
                 $valid ? $_SESSION['ok'] = $this::RESET_TABLE_OK_INFO : $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
