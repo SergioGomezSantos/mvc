@@ -16,8 +16,10 @@
         <br>
         <? 
             if ($exist) {
+
                 echo "<p>La tabla Contactos Trabajo ya existe.</p>";
             } else {
+                
                 echo "<p>La tabla Contactos Trabajo todavía no existe.</p>";
             }
         ?>

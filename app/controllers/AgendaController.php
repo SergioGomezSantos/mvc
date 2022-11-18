@@ -7,6 +7,7 @@ use App\Models\AgendaModel;
 
 class AgendaController {
 
+    // Definir constantes a utlizar. Los 2 tipos de contacto y todos los errores.
     const TYPES_ARRAY = array('persona', 'empresa');
     const ERROR_FORM_INFO = "Tipo, nombre, dirección y teléfono son campos necesarios";
     const ERROR_PERSONA_INFO = "Persona no puede tener email";
@@ -15,21 +16,26 @@ class AgendaController {
     const ERROR_EMPRESA_EMAIL = "Empresa no puede tener email vacío";
     const ERROR_LIST_INFO = "Elige un contacto de la lista";
 
+
+    // Definir nombre y agendaModel porque se usa éste último en todas las funciones. Privados para que no se pueda acceder desde fuera.
     private $name;
     private $agendaModel;
 
+    // Inicializo ambas variables.
     function __construct()
     {
         $this->name = "Agenda";
         $this->agendaModel = new AgendaModel();
     }
 
+    // Compruebo si existe la tabla desde el modelo y llamo a la vista. Dentro de la vista se utilizará $exist para mostrar un texto-botón u otro.
     public function index()
     {
         $exist = $this->agendaModel->checkBBDD();
         require "../app/views/home.php";
     }
 
+    // Llamo al modelo para inicializar la tabla en Base de Datos. Después, redirección al index. (Se mira si la tabla existe dentro del modelo).
     public function initialize() {
 
         $this->agendaModel->initializeBBDD();
@@ -37,6 +43,7 @@ class AgendaController {
         die();
     }
 
+    // Llamo al modelo para resetear los datos la tabla en Base de Datos. Después, redirección al index. (Se mira si la tabla existe dentro del modelo).
     public function reset() {
 
         $this->agendaModel->resetBBDD();
@@ -44,6 +51,8 @@ class AgendaController {
         die();
     }
 
+    // Compruebo si existe la tabla desde el modelo. Si existe, llamo a la vista. 
+    //                                               Si no existe, redirección a index.
     public function insert()
     {
         $exist = $this->agendaModel->checkBBDD();
@@ -59,6 +68,8 @@ class AgendaController {
         }
     }
 
+    // Compruebo si llega por POST. Si llega por POST, recojo todos los parámetros del formulario y si son válidos, inserto el contacto desde el modelo.
+    // Tanto si llega o no por POST, redirección de /agenda/insert para ver el resultado.
     public function checkInsert()
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST" && (isset($_POST['send']) && !empty($_POST['send']))) {
@@ -75,8 +86,13 @@ class AgendaController {
         die();
     }
 
+    // Función privada para recoger todos los parámetros del formulario y validarlos
     private function getAllParamsAndCheck()
     {
+
+        // Para cada campo, si viene de POST estando setteado y lleno, lo recojo y lo almaceno en la sesión para poder volver a rellenar el formulario.
+
+        // En el tipo, también compruebo que sea uno de los escritos en la constante TYPES_ARRAY
         if (isset($_POST['type']) && !empty($_POST['type']) && in_array($_POST['type'], $this::TYPES_ARRAY)) {
             $type = htmlspecialchars($_POST['type']);
             $_SESSION['prevForm']['prevType'] = $type;
@@ -112,45 +128,60 @@ class AgendaController {
             $_SESSION['prevForm']['id'] = $id;
         }
 
+
+        // Declaro valid como true.
         $valid = true;
+
+        // Si los campos que no pueden ser nulos están llenos, voy comprobando las demás restricciones para ajustar el error y la validación.
+        // .= y . " " para verlo mejor si necesita 2 errores
 
         if ($type && $name && $address && $phone) {
 
+            // Persona
             if ($type === $this::TYPES_ARRAY[0]) {
 
+                // Con Email
                 if ($email) {
 
-                    $_SESSION['error'] = $this::ERROR_PERSONA_INFO;
+                    $_SESSION['error'] .= $this::ERROR_PERSONA_INFO . " ";
                     $valid = false;
                 }
 
+                // Sin Apellidos
                 if (!$surnames) {
 
-                    $_SESSION['error'] = $this::ERROR_PERSONA_SURNAMES;
+                    $_SESSION['error'] .= $this::ERROR_PERSONA_SURNAMES;
                     $valid = false;
                 }
             }
 
+            // Empresa
             if ($type === $this::TYPES_ARRAY[1]) {
 
+                // Con Apellidos
                 if ($surnames) {
 
-                    $_SESSION['error'] = $this::ERROR_EMPRESA_INFO;
+                    $_SESSION['error'] .= $this::ERROR_EMPRESA_INFO  . " ";
                     $valid = false;
                 }
 
+                // Sin Email
                 if (!$email) {
 
-                    $_SESSION['error'] = $this::ERROR_EMPRESA_EMAIL;
+                    $_SESSION['error'] .= $this::ERROR_EMPRESA_EMAIL;
                     $valid = false;
                 }
             }
 
         } else {
 
+            // Si los campos que no pueden ser nulos están vacíos, ajusto el error y la validación.
+
             $valid = false;
             $_SESSION['error'] = $this::ERROR_FORM_INFO;
         }
+
+        // Devuelvo todos los parámetros y la validación.
 
         return [
             "valid" => $valid, 
@@ -164,6 +195,8 @@ class AgendaController {
         ];
     }
 
+    // Compruebo si existe la tabla desde el modelo. Si existe, busco la lista de contactos (id, nombre) desde el modelo y llamo a la vista. 
+    //                                               Si no existe, redirección a index.
     public function delete()
     {
         $exist = $this->agendaModel->checkBBDD();
@@ -180,6 +213,9 @@ class AgendaController {
         }
     }
 
+    // Compruebo si llega por POST. Si llega por POST, compruebo si tiene removeContatc (id). Si lo tiene, lo recojo y lo elimino desde el modelo.
+    //                                                                                        Si no lo tiene, ajusto el error.
+    // Tanto si llega o no por POST, redirección a /agenda/delete para ver el resultado.
     public function checkDelete()
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST" && (isset($_POST['deleteSend']) && !empty($_POST['deleteSend']))) {
@@ -199,11 +235,16 @@ class AgendaController {
         die();
     }
 
+    // Compruebo si existe la tabla desde el modelo. Si existe, compruebo si va a buscar un contacto en específico o no.                  
+    //                                               Si no existe, redirección a index.
     public function search()
     {
         $exist = $this->agendaModel->checkBBDD();
 
         if ($exist) {
+
+            // Si busca un contacto, recojo la id y busco el contacto desde el modelo. Declaro 2 variables para usar en la vista y la llamo.
+            // Si no busca un contacto en concreto, busco la lista de contactos (id, nombre) desde el modelo y llamo a la vista.
 
             if (isset($_GET['contact']) && !empty($_GET['contact'])) {
                 
@@ -226,12 +267,18 @@ class AgendaController {
         }
     }
 
+    // Compruebo si existe la tabla desde el modelo. Si existe, compruebo si va a actualizar un contacto en específico o no.                  
+    //                                               Si no existe, redirección a index.
     public function update()
     {
 
         $exist = $this->agendaModel->checkBBDD();
 
         if ($exist) {
+
+
+            // Si va a actualizar un contacto, recojo la id y busco el contacto desde el modelo. Declaro una variable para usar en la vista y la llamo.
+            // Si no va a actualizar un contacto, busco la lista de contactos (id, nombre) desde el modelo y llamo a la vista.
 
             if (isset($_GET['contact']) && !empty($_GET['contact'])) {
                 
@@ -254,6 +301,9 @@ class AgendaController {
         }
     }
 
+    // Compruebo si llega por POST. Si llega por POST, recojo todos los parámetros del formulario y si es válido, lo actualizo desde el modelo
+    // Si se actualiza, redirección a /agenda/update para ver el resultado
+    // Si no llega por POST y no se ha actualizo (redirección si actualiza), redirección a /agenda/update?contacto para ver el resultado pudiendo reintentar.
     public function updateSelected()
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST" && (isset($_POST['updateSend']) && !empty($_POST['updateSend']))) {
