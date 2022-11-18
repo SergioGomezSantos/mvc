@@ -10,21 +10,21 @@
     
     <?php require "header.php" ?>
 
-    <form id="listForm" name="form" action="/agenda/checkUpdate" method="POST">
+    <form id="listForm" name="form" action="" method="GET">
     
         <br>
         <h3 id="listTitle">Contacto a Actualizar: </h3>
-        <select id="listContatc" name="updateContatc">
+        <select id="listContatc" name="contact">
         
             <?
-                foreach ($contactsName as $contactName) {
-                    echo '<option value=' . $contactName . '>' . $contactName . '</option>';
+                foreach ($contacts as $contact) {
+                    echo '<option value=' . $contact["id"] . '>' . $contact["nombre"] . '</option>';
                 }
             ?>
 
         </select>
 
-        <button type="submit" name="updateSend" id="oneLineSend" value="updateSend">Actualizar</button>
+        <button type="submit" id="oneLineSend">Actualizar</button>
 
     </form>
 

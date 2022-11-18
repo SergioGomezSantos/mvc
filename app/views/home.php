@@ -43,6 +43,7 @@
     ?>
 
     <?php require "infoDivs.php" ?>
+    
 </body>
 
 </html>

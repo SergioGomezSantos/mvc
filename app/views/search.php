@@ -19,8 +19,8 @@
         <select id="listContatc" name="contact">
 
             <?
-                foreach ($contactsName as $contactName) {
-                    echo '<option value=' . $contactName . '>' . $contactName . '</option>';
+                foreach ($contacts as $contact) {
+                    echo '<option value=' . $contact["id"] . '>' . $contact["nombre"] . '</option>';
                 }
             ?>
 

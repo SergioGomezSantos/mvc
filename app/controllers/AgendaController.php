@@ -7,11 +7,13 @@ use App\Models\AgendaModel;
 
 class AgendaController {
 
+    const TYPES_ARRAY = array('persona', 'empresa');
     const ERROR_FORM_INFO = "Tipo, nombre, dirección y teléfono son campos necesarios";
     const ERROR_PERSONA_INFO = "Persona no puede tener email";
+    const ERROR_PERSONA_SURNAMES = "Persona no puede tener apellidos vacío";
     const ERROR_EMPRESA_INFO = "Empresa no puede tener apellidos";
+    const ERROR_EMPRESA_EMAIL = "Empresa no puede tener email vacío";
     const ERROR_LIST_INFO = "Elige un contacto de la lista";
-    const TYPES_ARRAY = array('persona', 'empresa');
 
     private $name;
     private $agendaModel;
@@ -105,29 +107,48 @@ class AgendaController {
             $_SESSION['prevForm']['prevEmail'] = $email;
         }
 
-        if (isset($_POST['prevName']) && !empty($_POST['prevName'])) {
-            $prevName = htmlspecialchars($_POST['prevName']);
-            $_SESSION['prevForm']['prevName'] = $email;
+        if (isset($_POST['id']) && !empty($_POST['id'])) {
+            $id = htmlspecialchars($_POST['id']);
+            $_SESSION['prevForm']['id'] = $id;
         }
+
+        $valid = true;
 
         if ($type && $name && $address && $phone) {
 
-            $valid = true;
+            if ($type === $this::TYPES_ARRAY[0]) {
 
-            if ($type === $this::TYPES_ARRAY[0] && $email) {
+                if ($email) {
 
-                $_SESSION['error'] = $this::ERROR_PERSONA_INFO;
-                $valid = false;
+                    $_SESSION['error'] = $this::ERROR_PERSONA_INFO;
+                    $valid = false;
+                }
+
+                if (!$surnames) {
+
+                    $_SESSION['error'] = $this::ERROR_PERSONA_SURNAMES;
+                    $valid = false;
+                }
             }
 
-            if ($type === $this::TYPES_ARRAY[1] && $surnames) {
+            if ($type === $this::TYPES_ARRAY[1]) {
 
-                $_SESSION['error'] = $this::ERROR_EMPRESA_INFO;
-                $valid = false;
+                if ($surnames) {
+
+                    $_SESSION['error'] = $this::ERROR_EMPRESA_INFO;
+                    $valid = false;
+                }
+
+                if (!$email) {
+
+                    $_SESSION['error'] = $this::ERROR_EMPRESA_EMAIL;
+                    $valid = false;
+                }
             }
 
         } else {
 
+            $valid = false;
             $_SESSION['error'] = $this::ERROR_FORM_INFO;
         }
 
@@ -139,7 +160,7 @@ class AgendaController {
             "address" => $address, 
             "phone" => $phone, 
             "email" => $email,
-            "prevName" => $prevName
+            "id" => $id
         ];
     }
 
@@ -149,7 +170,7 @@ class AgendaController {
 
         if ($exist) {
 
-            $contactsName = $this->agendaModel->getContactsNamesList();
+            $contacts = $this->agendaModel->getContactsList();
             require "../app/views/delete.php";
 
         } else {
@@ -186,14 +207,15 @@ class AgendaController {
 
             if (isset($_GET['contact']) && !empty($_GET['contact'])) {
                 
-                $contactName = htmlspecialchars($_GET['contact']);
-                $this->agendaModel->searchBBDD($contactName);
+                $contactId = htmlspecialchars($_GET['contact']);
+                $this->agendaModel->searchBBDD($contactId);
                 $readonly = "readonly";
+                $goBack = "search";
                 require "../app/views/seeContact.php";
 
             } else {
 
-                $contactsName = $this->agendaModel->getContactsNamesList();
+                $contacts = $this->agendaModel->getContactsList();
                 require "../app/views/search.php";
             }
 
@@ -213,13 +235,14 @@ class AgendaController {
 
             if (isset($_GET['contact']) && !empty($_GET['contact'])) {
                 
-                $contactName = htmlspecialchars($_GET['contact']);
-                $this->agendaModel->searchBBDD($contactName, true);
+                $contact = htmlspecialchars($_GET['contact']);
+                $this->agendaModel->searchBBDD($contact, true);
+                $goBack = "update";
                 require "../app/views/updateSelected.php";
 
             } else {
 
-                $contactsName = $this->agendaModel->getContactsNamesList();
+                $contacts = $this->agendaModel->getContactsList();
                 require "../app/views/update.php";
             }
             
@@ -231,27 +254,6 @@ class AgendaController {
         }
     }
 
-    public function checkUpdate()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === "POST" && (isset($_POST['updateSend']) && !empty($_POST['updateSend']))) {
-
-            if (isset($_POST['updateContatc']) && !empty($_POST['updateContatc'])) {
-
-                $updateContatc = htmlspecialchars($_POST['updateContatc']);
-
-                header('Location: /agenda/update?contact=' . $updateContatc);
-                die();
-
-            } else {
-                
-                $_SESSION['error'] = $this::ERROR_LIST_INFO;
-            }
-        }
-
-        header('Location: /agenda/update');
-        die();
-    }
-
     public function updateSelected()
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST" && (isset($_POST['updateSend']) && !empty($_POST['updateSend']))) {
@@ -261,7 +263,7 @@ class AgendaController {
             if ($params["valid"]) {
 
                 $updated = $this->agendaModel->updateBBDD($params["type"], $params["name"], $params["surnames"], $params["address"], 
-                                                $params["phone"], $params["email"], $params["prevName"]);
+                                                $params["phone"], $params["email"], $params["id"]);
 
                 if ($updated) {
 
@@ -271,7 +273,7 @@ class AgendaController {
                 }
             }
 
-            header('Location: /agenda/update?contact=' . $params["name"]);
+            header('Location: /agenda/update?contact=' . $params["id"]);
             die();
         }
 
@@ -297,5 +299,3 @@ class AgendaController {
         return $this;
     }
 }
-
-// TODO quitar checkUpdate por GET | Footer volver para search/x y update/X | restringir doble null en base de datos + unique en nombre

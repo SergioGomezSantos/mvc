@@ -1,12 +1,72 @@
+header {
+    position: relative;
+}
+
+nav {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+li {
+    display: inline-block;
+    list-style: none;
+    padding: 10px;
+}
+
+div {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 60%;
+    text-align: center;
+}
+
 h1 {
     text-align: center;
 }
+
+
+
 
 form {
     width: 320px;
     margin: 0 auto;
     position: relative;
 }
+
+#listForm {
+    width: 480px;
+    margin: 0 auto;
+    position: relative;
+}
+
+
+
+
+#resetTable {
+    margin-left: 80px;
+}
+
+#initializeTable {
+    margin-left: 95px;
+}
+
+
+
+
+#divError {
+    margin-top: 20px;
+    color: darkred;
+}
+
+#divOK {
+    margin-top: 20px;
+    color: green;
+}
+
+
+
 
 #loginUserName {
     margin-left: 18px;
@@ -22,48 +82,37 @@ form {
     right: 7px;
 }
 
-#divError {
-    margin-top: 50px;
-    color: darkred;
-}
-
-#divOK {
-    margin-top: 50px;
-    color: green;
-}
 
 
-#insertType {
+
+#inputType {
     margin-left: 168px;
     margin-bottom: 5px;
 }
 
-#insertName {
+#inputName {
     margin-left: 12px;
 }
 
-#insertSurnames {
+#inputSurnames {
     margin-left: 4px;
 }
 
-#insertPhone {
+#inputPhone {
     margin-left: 10px;
 }
 
-#insertEmail {
+#inputEmail {
     margin-left: 32px;
 }
 
-#insertSend {
+#inputSend {
     margin-left: 214px;
     margin-top: 5px;
 }
 
-#listForm {
-    width: 480px;
-    margin: 0 auto;
-    position: relative;
-}
+
+
 
 #listTitle {
     display: inline-block;
@@ -74,39 +123,10 @@ form {
     margin-left: 5px;
 }
 
+
+
+
 #updateSend {
     margin-left: 200px;
     margin-top: 5px;
-}
-
-#resetTable {
-    margin-left: 80px;
-}
-
-#initializeTable {
-    margin-left: 95px;
-}
-    
-div {
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    width: 60%;
-    text-align: center;
-}
-
-li {
-    display: inline-block;
-    list-style: none;
-    padding: 10px;
-}
-
-header {
-    position: relative;
-}
-
-nav {
-    position: absolute;
-    bottom: 0;
-    right: 0;
 }

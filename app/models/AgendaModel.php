@@ -7,18 +7,16 @@ class AgendaModel
 
     const TABLE_COLUMN = "Tables_in_agenda";
     const TABLE_NAME = "ContactosTrabajo";
-    const INITIALIZE_TABLE_OK_INFO = "Tabla Inicializada";
-    const INITIALIZE_TABLE_ERROR_INFO = "Error al inicializar la tabla";
     const RESET_TABLE_OK_INFO = "Valores Reseteados";
     const RESET_TABLE_ERROR_INFO = "Error al resetear la tabla";
-    const INSERT_OK_INFO = "%s insertada con éxito";
+    const INSERT_OK_INFO = "Éxito al insertar %s";
     const INSERT_ERROR_INFO = "Fallo al insertar la %s: %s";
-    const DELETE_OK_INFO = "%s eliminada con éxito";
-    const DELETE_ERROR_INFO = "Fallo al eliminar %s";
-    const SEARCH_OK_INFO = "%s encontrada con éxito";
-    const SEARCH_ERROR_INFO = "Fallo al encontrar %s";
-    const UPDATE_OK_INFO = "%s actualizada con éxito";
-    const UPDATE_ERROR_INFO = "Fallo al actualizar %s. Cambia los valores correctamente";
+    const DELETE_OK_INFO = "Éxito al eliminar";
+    const DELETE_ERROR_INFO = "Fallo al eliminar";
+    const SEARCH_OK_INFO = "Éxito al buscar";
+    const SEARCH_ERROR_INFO = "Fallo al buscar";
+    const UPDATE_OK_INFO = "Éxito al actualizar";
+    const UPDATE_ERROR_INFO = "Fallo al actualizar. Cambia los valores correctamente";
 
     public function __construct()
     {
@@ -57,7 +55,8 @@ class AgendaModel
             try {
 
                 $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
-                $sql = "CREATE TABLE ContactosTrabajo ( tipo varchar(255) NOT NULL, 
+                $sql = "CREATE TABLE ContactosTrabajo ( id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                                                          tipo varchar(255) NOT NULL, 
                                                           nombre varchar(255) NOT NULL, 
                                                           apellidos varchar(255) NULL, 
                                                           direccion varchar(255) NOT NULL, 
@@ -69,11 +68,11 @@ class AgendaModel
                 if ($dbResponse->rowCount() === 0) {
 
                     $this->resetBBDD();
-                    $_SESSION['ok'] = $this::INITIALIZE_TABLE_OK_INFO;
+                    $_SESSION['ok'] = INITIALIZE_TABLE_OK_INFO;
                     
                 } else {
 
-                    $_SESSION['error'] = $this::INITIALIZE_TABLE_ERROR_INFO;
+                    $_SESSION['error'] = INITIALIZE_TABLE_ERROR_INFO;
                 }
 
             } catch (\PDOException $e) {
@@ -176,24 +175,29 @@ class AgendaModel
         }
     }
 
-    public function getContactsNamesList() 
+    public function getContactsList() 
     {
 
         require "../bbdd.php";
         $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
-        $sql = sprintf("SELECT nombre from %s", $this::TABLE_NAME);
+        $sql = sprintf("SELECT id, nombre from %s", $this::TABLE_NAME);
         $dbResponse = $bd->query($sql);
 
-        $contactsName = [];
+        $contacts = [];
         if ($dbResponse->rowCount() > 0) {
 
             foreach ($dbResponse as $row) {
 
-                array_push($contactsName, $row["nombre"]);
+                $contact = [
+                    "id" => $row["id"],
+                    "nombre" => $row["nombre"]
+                ];
+
+                $contacts[] = $contact;
             }
         }
 
-        return $contactsName;
+        return $contacts;
     }
 
     public function deleteBBDD($removeContact) {
@@ -204,16 +208,16 @@ class AgendaModel
 
             $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
 
-            $sqlDelete = sprintf("DELETE FROM %s WHERE nombre like '$removeContact'", $this::TABLE_NAME);
+            $sqlDelete = sprintf("DELETE FROM %s WHERE  id like '$removeContact'", $this::TABLE_NAME);
             $dbResponseDelete = $bd->query($sqlDelete);
 
             if ($dbResponseDelete->rowCount() > 0) {
                 
-                $_SESSION['ok'] = sprintf($this::DELETE_OK_INFO, $removeContact);
+                $_SESSION['ok'] = $this::DELETE_OK_INFO;
 
             } else {
 
-                $_SESSION['error'] = sprintf($this::DELETE_ERROR_INFO, $removeContact);
+                $_SESSION['error'] = $this::DELETE_ERROR_INFO;
             }
 
         } catch (\PDOException $e) {
@@ -222,7 +226,7 @@ class AgendaModel
         }        
     }
 
-    public function searchBBDD($contactName, $forUpdate = false)
+    public function searchBBDD($contactId, $forUpdate = false)
     {
         require "../bbdd.php";
 
@@ -230,7 +234,7 @@ class AgendaModel
 
             $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
 
-            $sqlSearch = sprintf("SELECT * FROM %s WHERE nombre like '$contactName'", $this::TABLE_NAME);
+            $sqlSearch = sprintf("SELECT * FROM %s WHERE id like '$contactId'", $this::TABLE_NAME);
             $dbResponseSearch = $bd->query($sqlSearch);
 
             if ($dbResponseSearch->rowCount() === 1) {
@@ -243,6 +247,7 @@ class AgendaModel
                 $_SESSION['prevForm']['prevAddress'] = $searchContact["direccion"];
                 $_SESSION['prevForm']['prevPhone'] = $searchContact["telefono"];
                 $_SESSION['prevForm']['prevEmail'] = $searchContact["email"];
+                $_SESSION['prevForm']['id'] = $searchContact["id"];
 
                 if (!$forUpdate) {
                     $_SESSION['ok'] = sprintf($this::SEARCH_OK_INFO, $contactName);
@@ -270,7 +275,7 @@ class AgendaModel
         }      
     }
 
-    public function updateBBDD($type, $name, $surnames, $address, $phone, $email, $prevName)
+    public function updateBBDD($type, $name, $surnames, $address, $phone, $email, $id)
     {
         require "../bbdd.php";
 
@@ -279,10 +284,10 @@ class AgendaModel
             $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
 
             $sqlUpdate = sprintf("UPDATE ContactosTrabajo SET tipo = '$type', nombre = '$name', apellidos ='$surnames', direccion = '$address',
-                                                            telefono = '$phone', email = '$email' WHERE nombre like '$prevName'", $this::TABLE_NAME);
+                                                            telefono = '$phone', email = '$email' WHERE id like '$id'", $this::TABLE_NAME);
 
             $dbResponseUpdate = $bd->query($sqlUpdate);
-
+            
             if ($dbResponseUpdate->rowCount() > 0) {
 
                 $_SESSION['ok'] = sprintf($this::UPDATE_OK_INFO, ucwords($name));

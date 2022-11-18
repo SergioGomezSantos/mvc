@@ -18,7 +18,7 @@
 
         <? require "basicForm.php" ?>
 
-        <button type="submit" name="send" id="insertSend" value="send">Insertar</button>
+        <button type="submit" name="send" id="inputSend" value="send">Insertar</button>
     </form>
 
     <? 

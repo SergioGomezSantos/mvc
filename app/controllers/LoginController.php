@@ -11,15 +11,26 @@ class LoginController
 {
     const FORM_ERROR = "Ambos campos son necesarios";
     private $name;
+    private $loginModel;
 
     function __construct()
     {
         $this->name = "Login";
+        $this->loginModel = new LoginModel();
     }
 
     public function index()
     {
+        $exist = $this->loginModel->checkBBDD();
         require "../app/views/login.php";
+    }
+
+    public function initialize() 
+    {
+
+        $this->loginModel->initializeBBDD();
+        header('Location: /');
+        die();
     }
 
     public function check()
@@ -36,8 +47,7 @@ class LoginController
 
             if ($userName && $password) {
 
-                $loginModel = new LoginModel();
-                $loginModel->checkBBDD($userName, $password);
+                $this->loginModel->checkLogin($userName, $password);
 
             } else {
                 

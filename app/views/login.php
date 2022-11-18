@@ -12,17 +12,33 @@
 
     <? require "header.php" ?>
 
-    <form name="form" action="/login/check" method="POST" id="loginForm">
-
-        <label for="userName">Usuario: </label>
-        <input type="text" name="userName" id="loginUserName" value="<?= $_SESSION['prevForm']['prevUsername'] ?>" />
+    <div>
         <br>
-        <label for="password">Password: </label>
-        <input type="password" name="password" id="loginPassword" />
-        <br>
+        <? 
+            if ($exist) {
+                echo "<p>La tabla credenciales ya existe.</p>";
+            } else {
+                echo "<p>La tabla credenciales todavía no existe.</p>";
+            }
+        ?>
+    </div>
 
-        <button type="submit" name="send" id="loginSend" value="send">Enviar</button>
-    </form>
+    <?
+        if ($exist) {
+
+            require "loginForm.php";
+
+        } else {
+
+            echo '
+                <form action="/login/initialize">
+                    <input type="submit" value="Iniciar Tabla" id="initializeTable" />
+                </form>
+            ';
+        }
+    ?>
+
+        <br><br>
 
     <? 
         require "infoDivs.php";

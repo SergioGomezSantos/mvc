@@ -22,6 +22,7 @@
 
     <? 
         require "infoDivs.php";
+        require "footer.php";
         unset ($_SESSION['prevForm']);
     ?>
 
