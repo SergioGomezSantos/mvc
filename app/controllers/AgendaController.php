@@ -11,6 +11,7 @@ class AgendaController {
     const TYPES_ARRAY = array('persona', 'empresa');
 
     const FILE_EXTENSIONS_ALLOWED = ['pdf','jpg','png'];
+    const FILE_SIZE_LIMIT = 5000000;
     const UPLOAD_PATH = "../uploads/";
 
     const ERROR_FORM_INFO = "Tipo, nombre, dirección y teléfono son campos necesarios";
@@ -211,7 +212,7 @@ class AgendaController {
             }
 
             // Si el tamaño es mayor del límite
-            if ($fileSize > 5000000) {
+            if ($fileSize > $this::FILE_SIZE_LIMIT) {
 
                 $_SESSION['error'] = $this::ERROR_FILE_SIZE;
                 $valid = false;
