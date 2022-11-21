@@ -37,6 +37,14 @@ class Login {
                 echo "<br>";
             }
 
+            $credentials = $sentencia->fetchAll();
+            foreach ($credentials as $credential) {
+                echo "Nombre: " . $credential->name;
+                echo "<br>";
+                echo "Password: " . $credential->password;
+                echo "<br>";
+            }
+
         } catch (PDOException $e) {
             echo "Error BBDD: " . $e->getMessage();
         }
