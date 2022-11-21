@@ -23,7 +23,7 @@
 
         <!-- Imagen -->
         <label id="labelFile" for="file">Imagen: </label>
-        <input type="file" name="file" id="inputFile" value="<?= $_SESSION['prevForm']['prevFile'] ?>" <?= $readonly ?> />
+        <input type="file" name="file" id="inputFile"/>
         <br>
 
         <button type="submit" name="updateSend" id="updateSend" value="updateSend">Actualizar</button>
