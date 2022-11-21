@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
-class Product {
+use PDO;
+use Core\Model;
+require_once '../core/Model.php';
+
+class Product extends Model {
 
     const PRODUCTS = [
         array(1, 'Product A'),
@@ -16,13 +20,38 @@ class Product {
         
     }
 
+    // public static function all()
+    // {
+    //     return Product::PRODUCTS;
+    // }
+    
+    // public static function find($id)
+    // {
+    //     return Product::PRODUCTS[$id-1];
+    // }
+
     public static function all()
     {
-        return Product::PRODUCTS;
+        //TODO 
     }
-    
+
     public static function find($id)
     {
-        return Product::PRODUCTS[$id-1];
+        //TODO 
+    }
+
+    public function insert()
+    {
+        //TODO
+    }
+
+    public function delete()
+    {
+        //TODO
+    }
+
+    public function save()
+    { 
+        //TODO
     }
 }

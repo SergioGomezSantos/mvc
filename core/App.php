@@ -24,24 +24,15 @@ class App
         if (file_exists($file)) {
 
             require_once "$file";
+
         } else {
 
             http_response_code(404);
             die("Not Found");
         }
 
-        switch ($controllerName) {
-
-            case "LoginController":
-                $controllerObject = new LoginController;
-                break;
-            case "ProductController":
-                $controllerObject = new ProductController;
-                break;
-            default:
-                $controllerObject = new HomeController;
-                break;
-        }
+        $controllerName = "\\App\\Controllers\\$controllerName";
+        $controllerObject = new $controllerName;
 
         if (method_exists($controllerObject, $method)) {
 
