@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
-class LoginModel {
+use Core\Model;
+require_once "../core/Model.php";
+
+class LoginModel extends Model {
 
     const TABLE_COLUMN = "Tables_in_agenda";
     const TABLE_NAME = "credenciales";
+    const INITIALIZE_TABLE_OK_INFO = "Tabla Inicializada";
+    const INITIALIZE_TABLE_ERROR_INFO = "Error al inicializar la tabla";
     const LOGIN_ERROR = "Credenciales incorrectos";
 
     public function __construct()
@@ -19,10 +24,9 @@ class LoginModel {
     {
         $exist = false;
 
-        require "../bbdd.php";
-        $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+        $db = LoginModel::db();        
         $sql = "SHOW TABLES";
-        $dbResponse = $bd->query($sql);
+        $dbResponse = $db->query($sql);
 
         if ($dbResponse->rowCount() > 0) {
 
@@ -47,32 +51,22 @@ class LoginModel {
 
         if (!$exist) {
             
-            require "../bbdd.php";
+            $db = LoginModel::db();
+            $sql = file_get_contents('../documents/agenda.sql');
+            $dbResponse = $db->exec($sql);
 
-            try {
+            if ($dbResponse === 0) {
 
-                $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+                $_SESSION['ok'] = $this::INITIALIZE_TABLE_OK_INFO;
+                
+            } else {
 
-                $sql = file_get_contents('../documents/agenda.sql');
-                $dbResponse = $bd->exec($sql);
-
-                if ($dbResponse === 0) {
-
-                    $_SESSION['ok'] = INITIALIZE_TABLE_OK_INFO;
-                    
-                } else {
-
-                    $_SESSION['error'] = INITIALIZE_TABLE_ERROR_INFO;
-                }
-
-            } catch (\PDOException $e) {
-
-                $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+                $_SESSION['error'] = $this::INITIALIZE_TABLE_ERROR_INFO;
             }
 
         } else {
 
-            $_SESSION['error'] = INITIALIZE_TABLE_ERROR_INFO;
+            $_SESSION['error'] = $this::INITIALIZE_TABLE_ERROR_INFO;
         }
     }
 
@@ -82,32 +76,23 @@ class LoginModel {
     // Si algo está mal, marco el error y guardo el nombre de usuario en prevForm para poder volver a escribirlo en el formulario
     public function checkLogin($userName, $password)
     {
-        require "../bbdd.php";
+        $db = LoginModel::db();
+        $sql = "SELECT usuario, password FROM credenciales WHERE (usuario = '$userName')";
+        $dbResponse = $db->query($sql);
+        $select = $dbResponse->fetch();
 
-        try {
+        if ($dbResponse->rowCount() === 1 && password_verify($password, $select['password'])) {
 
-            $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
-            $sql = "SELECT usuario, password FROM credenciales WHERE (usuario = '$userName')";
-            $dbResponse = $bd->query($sql);
-            $select = $dbResponse->fetch();
+            $_SESSION = array();
+            $_SESSION['userName'] = $userName;
+            unset($_SESSION['prevForm']);
+            header('Location: /agenda');
+            die();
 
-            if ($dbResponse->rowCount() === 1 && password_verify($password, $select['password'])) {
+        } else {
 
-                $_SESSION = array();
-                $_SESSION['userName'] = $userName;
-                unset($_SESSION['prevForm']);
-                header('Location: /agenda');
-                die();
-
-            } else {
-
-                $_SESSION['error'] = $this::LOGIN_ERROR;
-                $_SESSION['prevForm']['prevUsername'] = $userName;
-            }
-            
-        } catch (\PDOException $e) {
-
-            $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+            $_SESSION['error'] = $this::LOGIN_ERROR;
+            $_SESSION['prevForm']['prevUsername'] = $userName;
         }
     }
 }

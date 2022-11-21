@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
-class AgendaModel
+use Core\Model;
+require_once "../core/Model.php";
+
+class AgendaModel extends Model
 {
 
     // Definir constantes a utlizar. El nombre de la tabla, la columna (Para SHOW TABLES) y todos los ok/errores.
     const TABLE_NAME = "ContactosTrabajo";
     const TABLE_COLUMN = "Tables_in_agenda";
+    const INITIALIZE_TABLE_OK_INFO = "Tabla Inicializada";
+    const INITIALIZE_TABLE_ERROR_INFO = "Error al inicializar la tabla";
     const RESET_TABLE_OK_INFO = "Valores Reseteados";
     const RESET_TABLE_ERROR_INFO = "Error al resetear la tabla";
     const XML_NOT_FOUND = "Archivo XML no encontrado";
@@ -31,10 +36,10 @@ class AgendaModel
     {
         $exist = false;
 
-        require "../bbdd.php";
-        $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+        $db = AgendaModel::db();
+
         $sql = "SHOW TABLES";
-        $dbResponse = $bd->query($sql);
+        $dbResponse = $db->query($sql);
 
         if ($dbResponse->rowCount() > 0) {
 
@@ -58,41 +63,32 @@ class AgendaModel
 
         if (!$exist) {
 
-            require "../bbdd.php";
+            $db = AgendaModel::db();
 
-            try {
+            // He añadido una id auto incremental para evitar problemas de duplicidad. Apellidos y Email pueden ser NULL
+            $sql = "CREATE TABLE ContactosTrabajo ( id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                                                        tipo varchar(255) NOT NULL, 
+                                                        nombre varchar(255) NOT NULL, 
+                                                        apellidos varchar(255) NULL, 
+                                                        direccion varchar(255) NOT NULL, 
+                                                        telefono int(11) NOT NULL,
+                                                        email varchar(255) NULL )
+                                                        ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+            $dbResponse = $db->query($sql);
 
-                $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+            if ($dbResponse->rowCount() === 0) {
 
-                // He añadido una id auto incremental para evitar problemas de duplicidad. Apellidos y Email pueden ser NULL
-                $sql = "CREATE TABLE ContactosTrabajo ( id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                                                          tipo varchar(255) NOT NULL, 
-                                                          nombre varchar(255) NOT NULL, 
-                                                          apellidos varchar(255) NULL, 
-                                                          direccion varchar(255) NOT NULL, 
-                                                          telefono int(11) NOT NULL,
-                                                          email varchar(255) NULL )
-                                                          ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
-                $dbResponse = $bd->query($sql);
+                $this->resetBBDD();
+                $_SESSION['ok'] = $this::INITIALIZE_TABLE_OK_INFO;
+                
+            } else {
 
-                if ($dbResponse->rowCount() === 0) {
-
-                    $this->resetBBDD();
-                    $_SESSION['ok'] = INITIALIZE_TABLE_OK_INFO;
-                    
-                } else {
-
-                    $_SESSION['error'] = INITIALIZE_TABLE_ERROR_INFO;
-                }
-
-            } catch (\PDOException $e) {
-
-                $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+                $_SESSION['error'] = $this::INITIALIZE_TABLE_ERROR_INFO;
             }
 
         } else {
 
-            $_SESSION['error'] = INITIALIZE_TABLE_ERROR_INFO;
+            $_SESSION['error'] = $this::INITIALIZE_TABLE_ERROR_INFO;
         }
     }
 
@@ -110,54 +106,45 @@ class AgendaModel
 
         if ($exist) {
 
-            require "../bbdd.php";
+            $valid = true;
+            $db = AgendaModel::db();
 
-            try {
+            $sqlTruncate = sprintf("TRUNCATE TABLE %s", $this::TABLE_NAME);
+            $dbResponseTruncate = $db->query($sqlTruncate);
 
-                $valid = true;
-                $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+            if ($dbResponseTruncate) {
+                
+                $xmlData = simplexml_load_file("../documents/agenda.xml");
 
-                $sqlTruncate = sprintf("TRUNCATE TABLE %s", $this::TABLE_NAME);
-                $dbResponseTruncate = $bd->query($sqlTruncate);
+                if ($xmlData) {
 
-                if ($dbResponseTruncate) {
+                    foreach ($xmlData->children() as $contact) {
                     
-                    $xmlData = simplexml_load_file("../documents/agenda.xml");
+                        $type = $contact["tipo"];
+                        $name = $contact->nombre;
+                        $surnames = $contact->apellidos;
+                        $address = $contact->direccion;
+                        $phone = $contact->telefono;
+                        $email = $contact->email;
 
-                    if ($xmlData) {
-
-                        foreach ($xmlData->children() as $contact) {
+                        // insertBBDD() es una función privada para hacer el insert. Se inserta en 2 funciones distintas así que la he separado para no repetir código.
+                        $dbResponseInsert = $this->insertBBDD($db, $type, $name, $surnames, $address, $phone, $email);
                         
-                            $type = $contact["tipo"];
-                            $name = $contact->nombre;
-                            $surnames = $contact->apellidos;
-                            $address = $contact->direccion;
-                            $phone = $contact->telefono;
-                            $email = $contact->email;
-    
-                            // insertBBDD() es una función privada para hacer el insert. Se inserta en 2 funciones distintas así que la he separado para no repetir código.
-                            $dbResponseInsert = $this->insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email);
-                            
-                            if (!$dbResponseInsert) {
-                                $valid = false;
-                            }
+                        if (!$dbResponseInsert) {
+                            $valid = false;
                         }
-
-                        $valid ? $_SESSION['ok'] = $this::RESET_TABLE_OK_INFO : $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
-
-                    } else {
-
-                        $_SESSION['error'] = $this::XML_NOT_FOUND;
                     }
+
+                    $valid ? $_SESSION['ok'] = $this::RESET_TABLE_OK_INFO : $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
 
                 } else {
 
-                    $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
+                    $_SESSION['error'] = $this::XML_NOT_FOUND;
                 }
 
-            } catch (\PDOException $e) {
+            } else {
 
-                $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+                $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
             }
 
         } else {
@@ -168,38 +155,29 @@ class AgendaModel
 
     // Función privada para no repetir código. Recie la $bd y los valores. 
     // Ejecuta el insert y devuelve el resultado
-    private function insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email) {
+    private function insertBBDD($db, $type, $name, $surnames, $address, $phone, $email) {
 
         $sqlInsert = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email) 
                                 VALUES ('$type', '$name', '$surnames', '$address', '$phone', '$email')", $this::TABLE_NAME);
 
-        return $bd->query($sqlInsert);
+        return $db->query($sqlInsert);
     }
 
     // Con los credenciales para la BBDD, inserto los valores que recibo del controller. Compruebo si se ha insertado y marco ok/error. 
     // Si insert devuelve ok, reseteo prevForm porque ya no hace falta guardar los valores del formulario.
     public function checkInsertBBDD($type, $name, $surnames, $address, $phone, $email)
     {
-        require "../bbdd.php";
+        $db = AgendaModel::db();
+        $dbResponseInsert = $this->insertBBDD($db, $type, $name, $surnames, $address, $phone, $email);
 
-        try {
+        if ($dbResponseInsert) {
 
-            $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
-            $dbResponseInsert = $this->insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email);
+            $_SESSION['ok'] = sprintf($this::INSERT_OK_INFO, ucwords($type));
+            unset($_SESSION['prevForm']);
 
-            if ($dbResponseInsert) {
+        } else {
 
-                $_SESSION['ok'] = sprintf($this::INSERT_OK_INFO, ucwords($type));
-                unset($_SESSION['prevForm']);
-
-            } else {
-
-                $_SESSION['error'] = sprintf($this::INSERT_ERROR_INFO, ucwords($type), "");
-            }
-            
-        } catch (\PDOException $e) {
-
-            $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+            $_SESSION['error'] = sprintf($this::INSERT_ERROR_INFO, ucwords($type), "");
         }
     }
 
@@ -208,11 +186,9 @@ class AgendaModel
     // Devuelve el array de contactos. Si no ha recibido datos del select, el array estaŕa vacío.
     public function getContactsList() 
     {
-
-        require "../bbdd.php";
-        $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+        $db = AgendaModel::db();
         $sql = sprintf("SELECT id, nombre from %s", $this::TABLE_NAME);
-        $dbResponse = $bd->query($sql);
+        $dbResponse = $db->query($sql);
 
         $contacts = [];
         if ($dbResponse->rowCount() > 0) {
@@ -235,28 +211,19 @@ class AgendaModel
     // Compruebo el resultado para marcar ok/error
     public function deleteBBDD($removeContact) {
 
-        require "../bbdd.php";
+        $db = AgendaModel::db();
 
-        try {
+        $sqlDelete = sprintf("DELETE FROM %s WHERE  id like '$removeContact'", $this::TABLE_NAME);
+        $dbResponseDelete = $db->query($sqlDelete);
 
-            $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
-
-            $sqlDelete = sprintf("DELETE FROM %s WHERE  id like '$removeContact'", $this::TABLE_NAME);
-            $dbResponseDelete = $bd->query($sqlDelete);
-
-            if ($dbResponseDelete->rowCount() > 0) {
+        if ($dbResponseDelete->rowCount() > 0) {
                 
-                $_SESSION['ok'] = $this::DELETE_OK_INFO;
+            $_SESSION['ok'] = $this::DELETE_OK_INFO;
 
-            } else {
+        } else {
 
-                $_SESSION['error'] = $this::DELETE_ERROR_INFO;
-            }
-
-        } catch (\PDOException $e) {
-
-            $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
-        }        
+            $_SESSION['error'] = $this::DELETE_ERROR_INFO;
+        }
     }
 
     // Con los credenciales para la BBDD, hago un select para la id que recivo del controller.
@@ -267,82 +234,64 @@ class AgendaModel
     // Si $forUpdate es true/false queire decir que viene de update/search, por lo que se marca el ok/error y se hace la redirección adecuadamente
     public function searchBBDD($contactId, $forUpdate = false)
     {
-        require "../bbdd.php";
+        $db = AgendaModel::db();
 
-        try {
+        $sqlSearch = sprintf("SELECT * FROM %s WHERE id like '$contactId'", $this::TABLE_NAME);
+        $dbResponseSearch = $db->query($sqlSearch);
 
-            $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+        if ($dbResponseSearch->rowCount() === 1) {
+            
+            $searchContact = $dbResponseSearch->fetch();
 
-            $sqlSearch = sprintf("SELECT * FROM %s WHERE id like '$contactId'", $this::TABLE_NAME);
-            $dbResponseSearch = $bd->query($sqlSearch);
+            $_SESSION['prevForm']['prevType'] = $searchContact["tipo"];
+            $_SESSION['prevForm']['prevName'] = $searchContact["nombre"];
+            $_SESSION['prevForm']['prevSurnames'] = $searchContact["apellidos"];
+            $_SESSION['prevForm']['prevAddress'] = $searchContact["direccion"];
+            $_SESSION['prevForm']['prevPhone'] = $searchContact["telefono"];
+            $_SESSION['prevForm']['prevEmail'] = $searchContact["email"];
+            $_SESSION['prevForm']['id'] = $searchContact["id"];
 
-            if ($dbResponseSearch->rowCount() === 1) {
-                
-                $searchContact = $dbResponseSearch->fetch();
-
-                $_SESSION['prevForm']['prevType'] = $searchContact["tipo"];
-                $_SESSION['prevForm']['prevName'] = $searchContact["nombre"];
-                $_SESSION['prevForm']['prevSurnames'] = $searchContact["apellidos"];
-                $_SESSION['prevForm']['prevAddress'] = $searchContact["direccion"];
-                $_SESSION['prevForm']['prevPhone'] = $searchContact["telefono"];
-                $_SESSION['prevForm']['prevEmail'] = $searchContact["email"];
-                $_SESSION['prevForm']['id'] = $searchContact["id"];
-
-                if (!$forUpdate) {
-                    $_SESSION['ok'] = sprintf($this::SEARCH_OK_INFO, $contactName);
-                }
-
-            } else {
-
-                $_SESSION['error'] = sprintf($this::SEARCH_ERROR_INFO, $contactName);
+            if (!$forUpdate) {
+                $_SESSION['ok'] = $this::SEARCH_OK_INFO;
             }
-
-        } catch (\PDOException $e) {
-
-            $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
-        }      
-
-        if ($forUpdate) {
-
-            header('Location: /agenda/update');
-            die();
 
         } else {
 
-            header('Location: /agenda/search');
-            die();
-        }
+            $_SESSION['error'] = $this::SEARCH_ERROR_INFO;
+
+            if ($forUpdate) {
+
+                header('Location: /agenda/update');
+                die();
+    
+            } else {
+    
+                header('Location: /agenda/search');
+                die();
+            }
+        }     
     }
 
     // Con los credenciales para la BBDD, hago el update con los datos que recibo sobre el contacto correspondiente a la id.
     // Compruebo el resultado para marcar ok/error.
     public function updateBBDD($type, $name, $surnames, $address, $phone, $email, $id)
     {
-        require "../bbdd.php";
+        $db = AgendaModel::db();
 
-        try {
+        $sqlUpdate = sprintf("UPDATE ContactosTrabajo SET tipo = '$type', nombre = '$name', apellidos ='$surnames', direccion = '$address',
+                                                        telefono = '$phone', email = '$email' WHERE id like '$id'", $this::TABLE_NAME);
 
-            $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+        $dbResponseUpdate = $db->query($sqlUpdate);
+        
+        if ($dbResponseUpdate->rowCount() > 0) {
 
-            $sqlUpdate = sprintf("UPDATE ContactosTrabajo SET tipo = '$type', nombre = '$name', apellidos ='$surnames', direccion = '$address',
-                                                            telefono = '$phone', email = '$email' WHERE id like '$id'", $this::TABLE_NAME);
+            $_SESSION['ok'] = $this::UPDATE_OK_INFO;
+            return true;
 
-            $dbResponseUpdate = $bd->query($sqlUpdate);
-            
-            if ($dbResponseUpdate->rowCount() > 0) {
+        } else {
 
-                $_SESSION['ok'] = sprintf($this::UPDATE_OK_INFO, ucwords($name));
-                return true;
-
-            } else {
-
-                $_SESSION['error'] = sprintf($this::UPDATE_ERROR_INFO, ucwords($name), "");
-                return false;
-            }
-            
-        } catch (\PDOException $e) {
-
-            $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
+            $_SESSION['error'] = $this::UPDATE_ERROR_INFO;
+            return false;
         }
     }
 }
