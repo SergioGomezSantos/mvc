@@ -5,8 +5,9 @@ namespace App\Models;
 class AgendaModel
 {
 
-    const TABLE_COLUMN = "Tables_in_agenda";
+    // Definir constantes a utlizar. El nombre de la tabla, la columna (Para SHOW TABLES) y todos los ok/errores.
     const TABLE_NAME = "ContactosTrabajo";
+    const TABLE_COLUMN = "Tables_in_agenda";
     const RESET_TABLE_OK_INFO = "Valores Reseteados";
     const RESET_TABLE_ERROR_INFO = "Error al resetear la tabla";
     const INSERT_OK_INFO = "Éxito al insertar %s";
@@ -22,6 +23,9 @@ class AgendaModel
     {
     }
 
+    // Declaro $exist como false.
+    // Con los credenciales para la BBDD, hago un SHOW TABLES y si hay respuesta, compruebo fila por fila si el nombre de cada tabla coincide con TABLE_COLUMN
+    // Si coincide, marco $exist como true. Devuelve $exist.
     public function checkBBDD()
     {
         $exist = false;
