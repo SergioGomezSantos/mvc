@@ -10,6 +10,7 @@ class AgendaModel
     const TABLE_COLUMN = "Tables_in_agenda";
     const RESET_TABLE_OK_INFO = "Valores Reseteados";
     const RESET_TABLE_ERROR_INFO = "Error al resetear la tabla";
+    const XML_NOT_FOUND = "Archivo XML no encontrado";
     const INSERT_OK_INFO = "Éxito al insertar %s";
     const INSERT_ERROR_INFO = "Fallo al insertar la %s: %s";
     const DELETE_OK_INFO = "Éxito al eliminar";
@@ -95,10 +96,16 @@ class AgendaModel
         }
     }
 
-    // Compruebo si la tabla existe (checkBBDD()). Si existe, delcaro $valid como true. TRUNCATE TABLE. Leo el .xml e inserto los contactos línea a línea.
-    //                                                  Si falla, cambio $valid a false. Al terminar el .xml, compruebo $valid para marcar ok/error.
-    //                                              Si no existe, marco el error
-    // Tanto si existe como si no, redirección a /
+    // Compruebo si la tabla existe (checkBBDD()). Si no existe, marco el error. 
+    //                                             Si existe, delcaro $valid como true y: 
+
+    //    1. TRUNCATE TABLE. Si truncate falla, marco el error.
+
+    //    2. Leo el .xml. Si no existe, marco el error.
+    //                    Si existe, inserto los contactos. Si algun contacto falla, cambio $valid a false. 
+    //                               Al terminar el .xml, compruebo $valid para marcar ok/error.
+ 
+    // Tanto si la tabla existe como si no, redirección a / para comprobar el resultado
     public function resetBBDD()
     {
         $exist = $this->checkBBDD();
@@ -119,28 +126,36 @@ class AgendaModel
                     
                     $xmlData = simplexml_load_file("../documents/agenda.xml");
 
-                    foreach ($xmlData->children() as $contact) {
-                        
-                        $type = $contact["tipo"];
-                        $name = $contact->nombre;
-                        $surnames = $contact->apellidos;
-                        $address = $contact->direccion;
-                        $phone = $contact->telefono;
-                        $email = $contact->email;
+                    if ($xmlData) {
 
-                        $dbResponseInsert = $this->insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email);
+                        foreach ($xmlData->children() as $contact) {
                         
-                        if (!$dbResponseInsert) {
-                            $valid = false;
+                            $type = $contact["tipo"];
+                            $name = $contact->nombre;
+                            $surnames = $contact->apellidos;
+                            $address = $contact->direccion;
+                            $phone = $contact->telefono;
+                            $email = $contact->email;
+    
+                            // insertBBDD() es una función privada para hacer el insert. Se inserta en 2 funciones distintas así que la he separado para no repetir código.
+                            $dbResponseInsert = $this->insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email);
+                            
+                            if (!$dbResponseInsert) {
+                                $valid = false;
+                            }
                         }
+
+                        $valid ? $_SESSION['ok'] = $this::RESET_TABLE_OK_INFO : $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
+
+                    } else {
+
+                        $_SESSION['error'] = $this::XML_NOT_FOUND;
                     }
 
                 } else {
 
-                    $valid = false;
+                    $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
                 }
-
-                $valid ? $_SESSION['ok'] = $this::RESET_TABLE_OK_INFO : $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
 
             } catch (\PDOException $e) {
 
@@ -155,6 +170,7 @@ class AgendaModel
         header('Location: /');
     }
 
+    // Función privada para no repetir código. Recie la $bd y los valores. Ejecuta el insert y devuelve el resultado
     private function insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email) {
 
         $sqlInsert = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email) 
@@ -163,6 +179,8 @@ class AgendaModel
         return $bd->query($sqlInsert);
     }
 
+    // Con los credenciales para la BBDD, inserto los valores que recibo del controller. Compruebo si se ha insertado y marco ok/error. 
+    // Si insert devuelve ok, reseteo prevForm porque ya no hace falta guardar los valores del formulario.
     public function checkInsertBBDD($type, $name, $surnames, $address, $phone, $email)
     {
         require "../bbdd.php";
