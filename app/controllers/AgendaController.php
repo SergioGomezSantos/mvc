@@ -69,7 +69,7 @@ class AgendaController {
     }
 
     // Compruebo si llega por POST. Si llega por POST, recojo todos los parámetros del formulario y si son válidos, inserto el contacto desde el modelo.
-    // Tanto si llega o no por POST, redirección de /agenda/insert para ver el resultado.
+    // Tanto si llega o no por POST, redirección a /agenda/insert para ver el resultado.
     public function checkInsert()
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST" && (isset($_POST['send']) && !empty($_POST['send']))) {
@@ -332,6 +332,7 @@ class AgendaController {
     }
 
     /**
+     * Getter para Name
      * Get the value of name
      */
     public function getName()
@@ -340,6 +341,7 @@ class AgendaController {
     }
 
     /**
+     * Setter para name
      * Set the value of name
      */
     public function setName($name): self
