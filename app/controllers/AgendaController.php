@@ -7,13 +7,21 @@ use App\Models\AgendaModel;
 
 class AgendaController {
 
-    // Definir constantes a utlizar. Los 2 tipos de contacto y todos los errores.
+    // Definir constantes a utlizar. Los 2 tipos de contacto, información para subir el archivo y todos los errores.
     const TYPES_ARRAY = array('persona', 'empresa');
+
+    const FILE_EXTENSIONS_ALLOWED = ['pdf','jpg','png'];
+    const UPLOAD_PATH = "../uploads/";
+
     const ERROR_FORM_INFO = "Tipo, nombre, dirección y teléfono son campos necesarios";
     const ERROR_PERSONA_INFO = "Persona no puede tener email";
     const ERROR_PERSONA_SURNAMES = "Persona no puede tener apellidos vacío";
     const ERROR_EMPRESA_INFO = "Empresa no puede tener apellidos";
     const ERROR_EMPRESA_EMAIL = "Empresa no puede tener email vacío";
+    const ERROR_UPLOAD = "Error al subir el archivo";
+    const ERROR_FILE_EXTENSION = "Sólo se permiten archivos pdf/png/jpg";
+    const ERROR_FILE_SIZE = "Sólo se permiten archivos de menos de 5MB";
+
     const ERROR_LIST_INFO = "Elige un contacto de la lista";
 
 
@@ -78,7 +86,8 @@ class AgendaController {
 
             if ($params["valid"]) {
 
-                $this->agendaModel->checkInsertBBDD($params["type"], $params["name"], $params["surnames"], $params["address"], $params["phone"], $params["email"]);
+                $this->agendaModel->checkInsertBBDD($params["type"], $params["name"], $params["surnames"], 
+                                                    $params["address"], $params["phone"], $params["email"], $params["image"]);
             }
         }
 
@@ -93,6 +102,8 @@ class AgendaController {
         // Para cada campo, si viene de POST estando setteado y lleno, lo recojo y lo almaceno en la sesión para poder volver a rellenar el formulario.
 
         // En el tipo, también compruebo que sea uno de los escritos en la constante TYPES_ARRAY
+        // Al final, si se ha enviado un archivo, recojo los valores y los valido. Si todo es válido, subo la foto
+
         if (isset($_POST['type']) && !empty($_POST['type']) && in_array($_POST['type'], $this::TYPES_ARRAY)) {
             $type = htmlspecialchars($_POST['type']);
             $_SESSION['prevForm']['prevType'] = $type;
@@ -177,8 +188,48 @@ class AgendaController {
 
             // Si los campos que no pueden ser nulos están vacíos, ajusto el error y la validación.
 
-            $valid = false;
             $_SESSION['error'] = $this::ERROR_FORM_INFO;
+            $valid = false;
+        }
+
+        // Declaro $uploadName null (lo mando en el return)
+        // Uso fileName para comprobar que se ha subido un archivo al formulario
+        $uploadName = null;
+        $fileName = $_FILES['file']['name'];
+
+        if ($fileName) {
+
+            $fileSize = $_FILES['file']['size'];
+            $fileTmpName  = $_FILES['file']['tmp_name'];
+            $fileExtension = strtolower(end(explode('.',$fileName)));
+
+            // Si la extensión no está en el array de extensiones válidas
+            if (!in_array($fileExtension, $this::FILE_EXTENSIONS_ALLOWED)) {
+
+                $_SESSION['error'] = $this::ERROR_FILE_EXTENSION;
+                $valid = false;
+            }
+
+            // Si el tamaño es mayor del límite
+            if ($fileSize > 5000000) {
+
+                $_SESSION['error'] = $this::ERROR_FILE_SIZE;
+                $valid = false;
+            }
+
+            // Si todo es válido, subo la imagen usando el fileTmpName para evitar duplicidad. Se podría sustituir por un hash
+            if ($valid) {
+
+                $uploadName = basename($fileTmpName) . '.' . $fileExtension;
+                $uploadPath = $this::UPLOAD_PATH . $uploadName; 
+                $upload = move_uploaded_file($fileTmpName, $uploadPath);
+        
+                if (!$upload) {
+
+                    $_SESSION['error'] = $this::ERROR_UPLOAD;
+                    $valid = false;
+                }
+            }
         }
 
         // Devuelvo todos los parámetros y la validación.
@@ -191,6 +242,7 @@ class AgendaController {
             "address" => $address, 
             "phone" => $phone, 
             "email" => $email,
+            "image" => $uploadName,
             "id" => $id
         ];
     }
@@ -313,7 +365,7 @@ class AgendaController {
             if ($params["valid"]) {
 
                 $updated = $this->agendaModel->updateBBDD($params["type"], $params["name"], $params["surnames"], $params["address"], 
-                                                $params["phone"], $params["email"], $params["id"]);
+                                                $params["phone"], $params["email"], $params["image"], $params["id"]);
 
                 if ($updated) {
 

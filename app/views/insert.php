@@ -14,12 +14,17 @@
     <?php require "header.php" ?>
 
     <!-- Formulario -->
-    <form name="form" action="/agenda/checkInsert" method="POST">
+    <form name="form" action="/agenda/checkInsert" method="POST" enctype="multipart/form-data">
 
         <h3>Crear un Contacto: </h3>
 
         <!-- Formulario Básico Reutilizable -->
         <? require "basicForm.php" ?>
+
+        <!-- Imagen -->
+        <label id="labelFile" for="file">Imagen: </label>
+        <input type="file" name="file" id="inputFile"/>
+        <br>
 
         <button type="submit" name="send" id="inputSend" value="send">Insertar</button>
     </form>

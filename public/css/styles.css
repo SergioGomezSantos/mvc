@@ -111,6 +111,17 @@ form {
     margin-top: 5px;
 }
 
+#labelFile {
+    display: inline-block;
+}
+
+#inputFile {
+    display: inline-block;
+    width: 220px;
+    margin-left: 18px;
+    margin-top: 5px;
+}
+
 
 
 

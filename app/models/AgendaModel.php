@@ -73,7 +73,8 @@ class AgendaModel extends Model
                                                         apellidos varchar(255) NULL, 
                                                         direccion varchar(255) NOT NULL, 
                                                         telefono int(11) NOT NULL,
-                                                        email varchar(255) NULL )
+                                                        email varchar(255) NULL,
+                                                        imagen varchar(255) NULL )
                                                         ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
             $dbResponse = $db->query($sql);
 
@@ -127,9 +128,10 @@ class AgendaModel extends Model
                         $address = $contact->direccion;
                         $phone = $contact->telefono;
                         $email = $contact->email;
+                        $image = null;
 
                         // insertBBDD() es una función privada para hacer el insert. Se inserta en 2 funciones distintas así que la he separado para no repetir código.
-                        $dbResponseInsert = $this->insertBBDD($db, $type, $name, $surnames, $address, $phone, $email);
+                        $dbResponseInsert = $this->insertBBDD($db, $type, $name, $surnames, $address, $phone, $email, $image);
                         
                         if (!$dbResponseInsert) {
                             $valid = false;
@@ -156,20 +158,20 @@ class AgendaModel extends Model
 
     // Función privada para no repetir código. Recie la $bd y los valores. 
     // Ejecuta el insert y devuelve el resultado
-    private function insertBBDD($db, $type, $name, $surnames, $address, $phone, $email) {
+    private function insertBBDD($db, $type, $name, $surnames, $address, $phone, $email, $image) {
 
-        $sqlInsert = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email) 
-                                VALUES ('$type', '$name', '$surnames', '$address', '$phone', '$email')", $this::TABLE_NAME);
+        $sqlInsert = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email, imagen) 
+                                VALUES ('$type', '$name', '$surnames', '$address', '$phone', '$email', '$image')", $this::TABLE_NAME);
 
         return $db->query($sqlInsert);
     }
 
     // Con el acceso a la BBDD, inserto los valores que recibo del controller. Compruebo si se ha insertado y marco ok/error. 
     // Si insert devuelve ok, reseteo prevForm porque ya no hace falta guardar los valores del formulario.
-    public function checkInsertBBDD($type, $name, $surnames, $address, $phone, $email)
+    public function checkInsertBBDD($type, $name, $surnames, $address, $phone, $email, $image)
     {
         $db = AgendaModel::db();
-        $dbResponseInsert = $this->insertBBDD($db, $type, $name, $surnames, $address, $phone, $email);
+        $dbResponseInsert = $this->insertBBDD($db, $type, $name, $surnames, $address, $phone, $email, $image);
 
         if ($dbResponseInsert) {
 
@@ -275,12 +277,12 @@ class AgendaModel extends Model
 
     // Con el acceso a la BBDD, hago el update con los datos que recibo sobre el contacto correspondiente a la id.
     // Compruebo el resultado para marcar ok/error.
-    public function updateBBDD($type, $name, $surnames, $address, $phone, $email, $id)
+    public function updateBBDD($type, $name, $surnames, $address, $phone, $email, $image, $id)
     {
         $db = AgendaModel::db();
 
         $sqlUpdate = sprintf("UPDATE ContactosTrabajo SET tipo = '$type', nombre = '$name', apellidos ='$surnames', direccion = '$address',
-                                                        telefono = '$phone', email = '$email' WHERE id like '$id'", $this::TABLE_NAME);
+                                                        telefono = '$phone', email = '$email', image = '$image' WHERE id like '$id'", $this::TABLE_NAME);
 
         $dbResponseUpdate = $db->query($sqlUpdate);
         
