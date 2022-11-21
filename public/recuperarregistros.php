@@ -19,7 +19,10 @@ class Login {
         try {
 
             $db = new PDO($dsn, $usuario, $password);
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
+            $sql = "SELECT * FROM credentials";
+
 
         } catch (PDOException $e) {
             echo "Error BD: " . $e->getMessage();
