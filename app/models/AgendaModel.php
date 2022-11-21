@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+// Uso, Require y Extends sobre Model, que contiene la función que se encarga de crear la conexión a la base de datos.
 use Core\Model;
 require_once "../core/Model.php";
 
@@ -30,7 +31,7 @@ class AgendaModel extends Model
     }
 
     // Declaro $exist como false.
-    // Con los credenciales para la BBDD, hago un SHOW TABLES y si hay respuesta, compruebo fila por fila si el nombre de cada tabla coincide con TABLE_NAME
+    // Con el acceso a la BBDD, hago un SHOW TABLES y si hay respuesta, compruebo fila por fila si el nombre de cada tabla coincide con TABLE_NAME
     // Si coincide, marco $exist como true. Devuelve $exist.
     public function checkBBDD()
     {
@@ -54,8 +55,8 @@ class AgendaModel extends Model
         return $exist;
     }
 
-    // Compruebo si la tabla existe (checkBBDD()). Si existe, creo la tabla con los credenciales para la BBDD. Si se crea, lanzo resetBBDD() y marco el OK.
-    //                                                                                                         Si no se crea, marco el error.
+    // Compruebo si la tabla existe (checkBBDD()). Si existe, creo la tabla con el acceso a la BBDD. Si se crea, lanzo resetBBDD() y marco el OK.
+    //                                                                                               Si no se crea, marco el error.
     //                                             Si no existe, marco el error.
     public function initializeBBDD()
     {
@@ -163,7 +164,7 @@ class AgendaModel extends Model
         return $db->query($sqlInsert);
     }
 
-    // Con los credenciales para la BBDD, inserto los valores que recibo del controller. Compruebo si se ha insertado y marco ok/error. 
+    // Con el acceso a la BBDD, inserto los valores que recibo del controller. Compruebo si se ha insertado y marco ok/error. 
     // Si insert devuelve ok, reseteo prevForm porque ya no hace falta guardar los valores del formulario.
     public function checkInsertBBDD($type, $name, $surnames, $address, $phone, $email)
     {
@@ -181,7 +182,7 @@ class AgendaModel extends Model
         }
     }
 
-    // Con los credenciales para la BBDD, hago un select para todas las filas de la tabla. Creo el array de contactos.
+    // Con el acceso a la BBDD, hago un select para todas las filas de la tabla. Creo el array de contactos.
     // Si devuelve datos, los leo línea a línea y voy creando arrays con los datos para guardarlos en el array de contactos
     // Devuelve el array de contactos. Si no ha recibido datos del select, el array estaŕa vacío.
     public function getContactsList() 
@@ -207,7 +208,7 @@ class AgendaModel extends Model
         return $contacts;
     }
 
-    // Con los credenciales para la BBDD, hago el delete con la id que recivo del controller
+    // Con el acceso a la BBDD, hago el delete con la id que recivo del controller
     // Compruebo el resultado para marcar ok/error
     public function deleteBBDD($removeContact) {
 
@@ -226,7 +227,7 @@ class AgendaModel extends Model
         }
     }
 
-    // Con los credenciales para la BBDD, hago un select para la id que recivo del controller.
+    // Con el acceso a la BBDD, hago un select para la id que recivo del controller.
     // Compruebo el resultado. Si recibo datos, los guardo en prevForm para utilizarlo en el formulario.
     //                         Si no recibo datos, marco el error.
 
@@ -272,7 +273,7 @@ class AgendaModel extends Model
         }     
     }
 
-    // Con los credenciales para la BBDD, hago el update con los datos que recibo sobre el contacto correspondiente a la id.
+    // Con el acceso a la BBDD, hago el update con los datos que recibo sobre el contacto correspondiente a la id.
     // Compruebo el resultado para marcar ok/error.
     public function updateBBDD($type, $name, $surnames, $address, $phone, $email, $id)
     {

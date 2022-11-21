@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+// Uso, Require y Extends sobre Model, que contiene la función que se encarga de crear la conexión a la base de datos.
 use Core\Model;
 require_once "../core/Model.php";
 
 class LoginModel extends Model {
 
+    // Definir constantes a utilizar. El nombre de la tabla, la columna (Para SHOW TABLES) y todos los ok/errores.
     const TABLE_COLUMN = "Tables_in_agenda";
     const TABLE_NAME = "credenciales";
     const INITIALIZE_TABLE_OK_INFO = "Tabla Inicializada";
@@ -18,7 +20,7 @@ class LoginModel extends Model {
     }
 
     // Declaro $exist como false.
-    // Con los credenciales para la BBDD, hago un SHOW TABLES y si hay respuesta, compruebo fila por fila si el nombre de cada tabla coincide con TABLE_NAME
+    // Con el acceso a la BBDD, hago un SHOW TABLES y si hay respuesta, compruebo fila por fila si el nombre de cada tabla coincide con TABLE_NAME
     // Si coincide, marco $exist como true. Devuelve $exist.
     public function checkBBDD()
     {
@@ -70,7 +72,7 @@ class LoginModel extends Model {
         }
     }
 
-    // Con los credenciales para la BBDD, hago el select respecto al nombre de usuario que recibo del controller.
+    // Con el acceso a la BBDD, hago el select respecto al nombre de usuario que recibo del controller.
     // Si recibo datos, quiere decir que el nombre de usuario es correcto, por lo que compruebo si las contraseñas coinciden.
     // Si todo coincide, guardo la información en la sesión, quito lo que haya en prevForm y redirección a /agenda.
     // Si algo está mal, marco el error y guardo el nombre de usuario en prevForm para poder volver a escribirlo en el formulario
