@@ -48,6 +48,9 @@ class AgendaModel
         return $exist;
     }
 
+    // Compruebo si la tabla existe (checkBBDD()). Si existe, creo la tabla con los credenciales para la BBDD. Si se crea, lanzo resetBBDD() y marco el OK.
+    //                                                                                                         Si no se crea, marco el error.
+    //                                             Si no existe, marco el error.
     public function initializeBBDD()
     {
         $exist = $this->checkBBDD();
@@ -59,6 +62,8 @@ class AgendaModel
             try {
 
                 $bd = new \PDO($access["dsn"], $access["userName"], $access["password"]);
+
+                // He añadido una id auto incremental para evitar problemas de duplicidad. Apellidos y Email pueden ser NULL
                 $sql = "CREATE TABLE ContactosTrabajo ( id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
                                                           tipo varchar(255) NOT NULL, 
                                                           nombre varchar(255) NOT NULL, 
@@ -86,7 +91,7 @@ class AgendaModel
 
         } else {
 
-            $_SESSION['error'] = $this::INITIALIZE_TABLE_ERROR_INFO;
+            $_SESSION['error'] = INITIALIZE_TABLE_ERROR_INFO;
         }
     }
 
