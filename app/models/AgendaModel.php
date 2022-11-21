@@ -25,7 +25,7 @@ class AgendaModel
     }
 
     // Declaro $exist como false.
-    // Con los credenciales para la BBDD, hago un SHOW TABLES y si hay respuesta, compruebo fila por fila si el nombre de cada tabla coincide con TABLE_COLUMN
+    // Con los credenciales para la BBDD, hago un SHOW TABLES y si hay respuesta, compruebo fila por fila si el nombre de cada tabla coincide con TABLE_NAME
     // Si coincide, marco $exist como true. Devuelve $exist.
     public function checkBBDD()
     {
@@ -104,8 +104,6 @@ class AgendaModel
     //    2. Leo el .xml. Si no existe, marco el error.
     //                    Si existe, inserto los contactos. Si algun contacto falla, cambio $valid a false. 
     //                               Al terminar el .xml, compruebo $valid para marcar ok/error.
- 
-    // Tanto si la tabla existe como si no, redirección a / para comprobar el resultado
     public function resetBBDD()
     {
         $exist = $this->checkBBDD();
@@ -166,11 +164,10 @@ class AgendaModel
 
             $_SESSION['error'] = $this::RESET_TABLE_ERROR_INFO;
         }
-
-        header('Location: /');
     }
 
-    // Función privada para no repetir código. Recie la $bd y los valores. Ejecuta el insert y devuelve el resultado
+    // Función privada para no repetir código. Recie la $bd y los valores. 
+    // Ejecuta el insert y devuelve el resultado
     private function insertBBDD($bd, $type, $name, $surnames, $address, $phone, $email) {
 
         $sqlInsert = sprintf("INSERT INTO %s (tipo, nombre, apellidos, direccion, telefono, email) 
@@ -206,6 +203,9 @@ class AgendaModel
         }
     }
 
+    // Con los credenciales para la BBDD, hago un select para todas las filas de la tabla. Creo el array de contactos.
+    // Si devuelve datos, los leo línea a línea y voy creando arrays con los datos para guardarlos en el array de contactos
+    // Devuelve el array de contactos. Si no ha recibido datos del select, el array estaŕa vacío.
     public function getContactsList() 
     {
 
@@ -231,6 +231,8 @@ class AgendaModel
         return $contacts;
     }
 
+    // Con los credenciales para la BBDD, hago el delete con la id que recivo del controller
+    // Compruebo el resultado para marcar ok/error
     public function deleteBBDD($removeContact) {
 
         require "../bbdd.php";
@@ -257,6 +259,12 @@ class AgendaModel
         }        
     }
 
+    // Con los credenciales para la BBDD, hago un select para la id que recivo del controller.
+    // Compruebo el resultado. Si recibo datos, los guardo en prevForm para utilizarlo en el formulario.
+    //                         Si no recibo datos, marco el error.
+
+    // Puede recibir $forUpdate, porque el método se llama tanto desde la parte de search como desde la parte de update
+    // Si $forUpdate es true/false queire decir que viene de update/search, por lo que se marca el ok/error y se hace la redirección adecuadamente
     public function searchBBDD($contactId, $forUpdate = false)
     {
         require "../bbdd.php";
@@ -287,25 +295,27 @@ class AgendaModel
             } else {
 
                 $_SESSION['error'] = sprintf($this::SEARCH_ERROR_INFO, $contactName);
-
-                if ($forUpdate) {
-
-                    header('Location: /agenda/update');
-                    die();
-
-                } else {
-
-                    header('Location: /agenda/search');
-                    die();
-                }
             }
 
         } catch (\PDOException $e) {
 
             $_SESSION['error'] = sprintf(DB_ERROR, $e->getMessage());
         }      
+
+        if ($forUpdate) {
+
+            header('Location: /agenda/update');
+            die();
+
+        } else {
+
+            header('Location: /agenda/search');
+            die();
+        }
     }
 
+    // Con los credenciales para la BBDD, hago el update con los datos que recibo sobre el contacto correspondiente a la id.
+    // Compruebo el resultado para marcar ok/error.
     public function updateBBDD($type, $name, $surnames, $address, $phone, $email, $id)
     {
         require "../bbdd.php";
