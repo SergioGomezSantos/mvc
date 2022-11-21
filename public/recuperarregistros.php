@@ -1,19 +1,21 @@
 <?php
 
+$login = new Login();
+$login->all();
+
 class Login {
 
-    protected $nombreUsu = null;
+    protected $name = null;
     protected $password = null;
 
     public function __construct()
     {
-
     }
 
     public static function all()
     {
         $dsn = "mysql:host=db;dbname=demo";
-        $usuario = "dbusesr";
+        $usuario = "dbuser";
         $password = "secret";
 
         try {
@@ -27,6 +29,13 @@ class Login {
             $sentencia->setFetchMode(PDO::FETCH_CLASS, Login::class);
             $sentencia->execute();
 
+            while ($obj = $sentencia->fetch()) {
+                
+                echo "Nombre: " . $obj->name;
+                echo "<br>";
+                echo "Password: " . $obj->password;
+                echo "<br>";
+            }
 
         } catch (PDOException $e) {
             echo "Error BBDD: " . $e->getMessage();
