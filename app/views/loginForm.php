@@ -1,3 +1,5 @@
+<!-- Formulario de login -->
+
 <form name="form" action="/login/check" method="POST" id="loginForm">
 
 <label for="userName">Usuario: </label>

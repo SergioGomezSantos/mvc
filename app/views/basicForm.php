@@ -1,7 +1,14 @@
+
+<!-- Formulario que reutilizo en insert y en update/search ya sea vacío o con los valores anteriores/encontrados -->
+
 <label for="type">Tipo: </label>
 <select id="inputType" name="type">
 
     <? 
+        // Si existe readonly (viene de search), solo aparece una opción (prevType) para que no se pueda modificar
+        // Si prevType, pongo selected en el tipo correspondiente y añado la otra opción
+        // Si ninguna, muestro ambas opciones sin ningún añadido
+
         if ($readonly) {
 
             echo "<option>" . ucwords($_SESSION['prevForm']['prevType']) . "</option>";
@@ -24,6 +31,12 @@
     ?>
 
 </select>
+
+<!-- Formulario Base. 
+     Cuando no existe prevForm, no rellenará con nada 
+     Cuando no exista $readonly, no lo pondrá
+     Campo hidden con la id para poder usarlo al hacer update con los cambios
+-->
 
 <br>
 <label for="name">Nombre: </label>

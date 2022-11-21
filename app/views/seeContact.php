@@ -10,16 +10,20 @@
 
 <body>
 
+    <!-- Cabecera -->
     <?php require "header.php" ?>
 
+    <!-- Formulario -->
     <form name="form" action="" method="GET">
 
         <h3>Contacto: </h3>
 
+        <!-- Formulario Básico Reutilizable -->
         <? require "basicForm.php" ?>
 
     </form>
 
+    <!-- Divs ok/error + Footer para volver + unset PrevForm al terminar para limpiar -->
     <? 
         require "infoDivs.php";
         require "footer.php";

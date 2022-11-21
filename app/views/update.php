@@ -8,8 +8,10 @@
 </head>
 <body>
     
+    <!-- Cabecera -->
     <?php require "header.php" ?>
 
+    <!-- Formulario -->
     <form id="listForm" name="form" action="" method="GET">
     
         <br>
@@ -17,7 +19,9 @@
         <select id="listContatc" name="contact">
         
             <?
+                // Recorro los contactos para crear una lista de opciones para el select con value|text = id|nombre de cada contacto
                 foreach ($contacts as $contact) {
+                    
                     echo '<option value=' . $contact["id"] . '>' . $contact["nombre"] . '</option>';
                 }
             ?>
@@ -28,6 +32,7 @@
 
     </form>
 
+    <!-- Divs ok/error -->
     <? 
         require "infoDivs.php";
     ?>

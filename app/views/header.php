@@ -1,5 +1,6 @@
 <header>
 
+    <!-- Nombre del controller | Nombre de Usuario si existe -->
     <h1>
         <?php
 
@@ -18,6 +19,10 @@
         <ul>
 
             <?php
+
+            // Si está logged, relleno el nav con los enlaces
+            // Compruebo la ruta en la que se encuentra para poner los textos como enlace o no
+            // Compruebo $exists para que cuando no exista la tabla, no muestre ningún enlace, solo los textos
 
             if (isset($_SESSION['userName'])) {
 

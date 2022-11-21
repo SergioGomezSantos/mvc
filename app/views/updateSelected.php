@@ -8,18 +8,22 @@
 </head>
 <body>
     
+    <!-- Cabecera -->
     <?php require "header.php" ?>
 
+    <!-- Formulario -->
     <form name="form" action="/agenda/updateSelected" method="POST">
     
         <h3>Actualizar un Contacto: </h3>
 
+        <!-- Formularaio Básico Reutilizable -->
         <? require "basicForm.php" ?>
 
         <button type="submit" name="updateSend" id="updateSend" value="updateSend">Actualizar</button>
 
     </form>
 
+    <!-- Divs ok/error + Footer (volver) + unset PrevForm al terminar para limpiar -->
     <? 
         require "infoDivs.php";
         require "footer.php";

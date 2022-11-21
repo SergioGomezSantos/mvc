@@ -10,17 +10,21 @@
 
 <body>
 
+    <!-- Cabecera -->
     <?php require "header.php" ?>
 
+    <!-- Formulario -->
     <form name="form" action="/agenda/checkInsert" method="POST">
 
         <h3>Crear un Contacto: </h3>
 
+        <!-- Formulario Básico Reutilizable -->
         <? require "basicForm.php" ?>
 
         <button type="submit" name="send" id="inputSend" value="send">Insertar</button>
     </form>
 
+    <!-- Divs ok/error + unset PrevForm al terminar para limpiar -->
     <? 
         require "infoDivs.php";
         unset ($_SESSION['prevForm']);

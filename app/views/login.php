@@ -10,20 +10,30 @@
 
 <body>
 
+    <!-- Cabecera -->
     <? require "header.php" ?>
 
+    <!-- Div Información -->
     <div>
         <br>
         <? 
+            // Muestro un texto informativo según exista o no la tabla Credenciales
+
             if ($exist) {
+
                 echo "<p>La tabla credenciales ya existe.</p>";
+
             } else {
+
                 echo "<p>La tabla credenciales todavía no existe.</p>";
             }
         ?>
     </div>
 
+    <!-- Formulario -->
     <?
+        // Muestro el formulario de login o un botón (formulario) para inicializar la tabla según exista o no la tabla Credenciales
+
         if ($exist) {
 
             require "loginForm.php";
@@ -40,6 +50,7 @@
 
         <br><br>
 
+    <!-- Divs ok/error + unset PrevForm al terminar para limpiar -->
     <? 
         require "infoDivs.php";
         unset ($_SESSION['prevForm']);

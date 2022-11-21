@@ -10,14 +10,19 @@
 
 <body>
 
+    <!-- Cabecera -->
     <?php require "header.php" ?>
 
+    <!-- Div Información -->
     <div>
         <br>
         <? 
+            // Muestro un texto informativo según exista o no la tabla Contacos
+
             if ($exist) {
 
                 echo "<p>La tabla Contactos Trabajo ya existe.</p>";
+
             } else {
                 
                 echo "<p>La tabla Contactos Trabajo todavía no existe.</p>";
@@ -25,7 +30,10 @@
         ?>
     </div>
 
+    <!-- Formulario Initialize/Reset -->
     <?
+        // Muestro un botón (formulatio) según exista o no la tabla Contactos para inicializar/resetear la tabla
+
         if ($exist) {
 
             echo '
@@ -44,6 +52,7 @@
         }
     ?>
 
+    <!-- Divs ok/error -->
     <?php require "infoDivs.php" ?>
     
 </body>
