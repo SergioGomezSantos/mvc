@@ -95,6 +95,10 @@ class AgendaModel
         }
     }
 
+    // Compruebo si la tabla existe (checkBBDD()). Si existe, delcaro $valid como true. TRUNCATE TABLE. Leo el .xml e inserto los contactos línea a línea.
+    //                                                  Si falla, cambio $valid a false. Al terminar el .xml, compruebo $valid para marcar ok/error.
+    //                                              Si no existe, marco el error
+    // Tanto si existe como si no, redirección a /
     public function resetBBDD()
     {
         $exist = $this->checkBBDD();
