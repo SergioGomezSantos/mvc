@@ -21,6 +21,11 @@
         <!-- Formulario Básico Reutilizable -->
         <? require "basicForm.php" ?>
 
+        <!-- Imagen -->
+        <label for="email">Imagen: </label>
+        <input type='text' name='image' id='inputImage' value='<?= $_SESSION['prevForm']['prevImage'] ?>' readonly />
+        <br>
+
     </form>
 
     <!-- Divs ok/error + Footer para volver + unset PrevForm al terminar para limpiar -->

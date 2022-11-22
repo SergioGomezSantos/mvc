@@ -193,9 +193,7 @@ class AgendaController {
             $valid = false;
         }
 
-        // Declaro $uploadName null (lo mando en el return)
         // Uso fileName para comprobar que se ha subido un archivo al formulario
-        $uploadName = null;
         $fileName = $_FILES['file']['name'];
 
         if ($fileName) {
@@ -218,10 +216,11 @@ class AgendaController {
                 $valid = false;
             }
 
-            // Si todo es válido, subo la imagen usando el fileTmpName para evitar duplicidad. Se podría sustituir por un hash
+            // Si todo es válido, subo la imagen creando un uniqid con un prefijo para evitar duplicidad => Imagen_XYZ.png
+            // Lo subo desde aquí porque solo se accede a este código desde insert/update, asi que si todo es válido, siempre se querría subir
             if ($valid) {
 
-                $uploadName = basename($fileTmpName) . '.' . $fileExtension;
+                $uploadName = uniqid("Imagen_") . '.' . $fileExtension;
                 $uploadPath = $this::UPLOAD_PATH . $uploadName; 
                 $upload = move_uploaded_file($fileTmpName, $uploadPath);
         
@@ -233,7 +232,7 @@ class AgendaController {
             }
         }
 
-        // Devuelvo todos los parámetros y la validación.
+        // Devuelvo todos los parámetros y la validación. Si las variables no han sido declaradas, devuelve null
 
         return [
             "valid" => $valid, 
@@ -303,8 +302,11 @@ class AgendaController {
                 
                 $contactId = htmlspecialchars($_GET['contact']);
                 $this->agendaModel->searchBBDD($contactId);
+
+                // Variables para usar en la vista para el formulario/footer reutilizable
                 $readonly = "readonly";
                 $goBack = "search";
+
                 require "../app/views/seeContact.php";
 
             } else {
@@ -337,7 +339,10 @@ class AgendaController {
                 
                 $contact = htmlspecialchars($_GET['contact']);
                 $this->agendaModel->searchBBDD($contact, true);
+
+                // Variable para usar en la vista para el footer reutilizable
                 $goBack = "update";
+                
                 require "../app/views/updateSelected.php";
 
             } else {

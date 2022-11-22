@@ -9,9 +9,11 @@ require_once "../core/Model.php";
 class AgendaModel extends Model
 {
 
-    // Definir constantes a utlizar. El nombre de la tabla, la columna (Para SHOW TABLES) y todos los ok/errores.
+    // Definir constantes a utlizar. El nombre de la tabla, la columna (Para SHOW TABLES), la ruta de las imagenes y todos los ok/errores.
     const TABLE_NAME = "ContactosTrabajo";
     const TABLE_COLUMN = "Tables_in_agenda";
+    const UPLOAD_PATH = "../uploads/";
+
     const INITIALIZE_TABLE_OK_INFO = "Tabla Inicializada";
     const INITIALIZE_TABLE_ERROR_INFO = "Error al inicializar la tabla";
     const RESET_TABLE_OK_INFO = "Valores Reseteados";
@@ -25,6 +27,7 @@ class AgendaModel extends Model
     const SEARCH_ERROR_INFO = "Fallo al buscar";
     const UPDATE_OK_INFO = "Éxito al actualizar";
     const UPDATE_ERROR_INFO = "Fallo al actualizar. Cambia los valores correctamente";
+    const FILE_NOT_FOUND = "Imagen no encontrada al eliminar";
 
     public function __construct()
     {
@@ -210,11 +213,16 @@ class AgendaModel extends Model
         return $contacts;
     }
 
-    // Con el acceso a la BBDD, hago el delete con la id que recivo del controller
-    // Compruebo el resultado para marcar ok/error
+    // Con el acceso a la BBDD, llamo a la función para borrar la imagen respecto a la id que recivo del controller.
+    // Hago el delete con la id que recivo del controller
+    // Compruebo el resultado para marcar ok/error. 
+    // Si se ha marcado un error al eliminar la imagen porque no se encuentra el archivo, no paro la ejecución sigo hasta borrar el contacto 
+    // pero igualmente aviso de que no se ha eliminado la imagen.
     public function deleteBBDD($removeContact) {
 
         $db = AgendaModel::db();
+
+        $this->deleteImage($db, $removeContact);
 
         $sqlDelete = sprintf("DELETE FROM %s WHERE  id like '$removeContact'", $this::TABLE_NAME);
         $dbResponseDelete = $db->query($sqlDelete);
@@ -226,6 +234,29 @@ class AgendaModel extends Model
         } else {
 
             $_SESSION['error'] = $this::DELETE_ERROR_INFO;
+        }       
+    }
+
+    // Función privada para no repetir código. Recie la $bd y el $id del contacto cuya foto se va a borrar. 
+    // Busco la imagen respecto al usuario y si existe, la borro
+    //                                       si no existe, marco el error
+    private function deleteImage($db, $removeContact)
+    {
+        $sqlSelect = sprintf("SELECT imagen from %s WHERE id like '$removeContact'", $this::TABLE_NAME);
+        $imageName = $db->query($sqlSelect)->fetch()["imagen"];
+
+        if ($imageName) {
+
+            $file_to_delete = $this::UPLOAD_PATH . $imageName;
+
+            if (is_file($file_to_delete)) {
+
+                unlink($file_to_delete);
+
+            } else {
+
+                $_SESSION['error'] = $this::FILE_NOT_FOUND;
+            }
         }
     }
 
@@ -252,6 +283,7 @@ class AgendaModel extends Model
             $_SESSION['prevForm']['prevAddress'] = $searchContact["direccion"];
             $_SESSION['prevForm']['prevPhone'] = $searchContact["telefono"];
             $_SESSION['prevForm']['prevEmail'] = $searchContact["email"];
+            $_SESSION['prevForm']['prevImage'] = $searchContact["imagen"];
             $_SESSION['prevForm']['id'] = $searchContact["id"];
 
             if (!$forUpdate) {
@@ -275,14 +307,20 @@ class AgendaModel extends Model
         }     
     }
 
-    // Con el acceso a la BBDD, hago el update con los datos que recibo sobre el contacto correspondiente a la id.
+    // Con el acceso a la BBDD, llamo a la función para borrar la imagen anterior respecto a la id que recivo del controller. 
+    // La nueva imagen ya ha sido validada y subida en el controller.
+    // Hago el update con los datos que recibo sobre el contacto correspondiente a la id.
     // Compruebo el resultado para marcar ok/error.
+    // Si se ha marcado un error al eliminar la imagen anterior porque no se encuentra el archivo, no paro la ejecución sigo hasta actualizar el contacto 
+    // pero igualmente aviso de que no se ha eliminado la imagen anterior.
     public function updateBBDD($type, $name, $surnames, $address, $phone, $email, $image, $id)
     {
         $db = AgendaModel::db();
 
+        $this->deleteImage($db, $id);
+
         $sqlUpdate = sprintf("UPDATE ContactosTrabajo SET tipo = '$type', nombre = '$name', apellidos ='$surnames', direccion = '$address',
-                                                        telefono = '$phone', email = '$email', image = '$image' WHERE id like '$id'", $this::TABLE_NAME);
+                                                        telefono = '$phone', email = '$email', imagen = '$image' WHERE id like '$id'", $this::TABLE_NAME);
 
         $dbResponseUpdate = $db->query($sqlUpdate);
         

@@ -106,19 +106,24 @@ form {
     margin-left: 32px;
 }
 
+#inputImage {
+    margin-left: 17px;
+}
+
 #inputSend {
     margin-left: 214px;
     margin-top: 5px;
 }
 
-#labelFile {
-    display: inline-block;
-}
-
 #inputFile {
-    display: inline-block;
     width: 220px;
     margin-left: 18px;
+    margin-top: 5px;
+}
+
+#inputFile2 {
+    width: 220px;
+    margin-left: 26px;
     margin-top: 5px;
 }
 
