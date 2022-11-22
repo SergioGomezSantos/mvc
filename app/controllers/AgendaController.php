@@ -52,10 +52,24 @@ class AgendaController {
         die();
     }
 
-    // Llamo al modelo para resetear los datos la tabla en Base de Datos. Después, redirección al index. (Se mira si la tabla existe dentro del modelo).
+    // Llamo al modelo para resetear los datos la tabla en Base de Datos. 
+    // Borro todas las imágenes de la carpeta uploads.
+    // Después, redirección al index. (Se mira si la tabla existe dentro del modelo).
     public function reset() {
 
         $this->agendaModel->resetBBDD();
+
+        $files = scandir($this::UPLOAD_PATH);
+
+        foreach ($files as $file) {
+
+            $file = $this::UPLOAD_PATH . $file;
+
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
+
         header('Location: /');
         die();
     }
