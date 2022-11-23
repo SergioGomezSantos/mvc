@@ -4,7 +4,6 @@ namespace App\Models;
 
 use PDO;
 use Core\Model;
-require_once '../core/Model.php';
 
 class Product extends Model {
 
@@ -20,25 +19,25 @@ class Product extends Model {
         
     }
 
-    // public static function all()
-    // {
-    //     return Product::PRODUCTS;
-    // }
-    
-    // public static function find($id)
-    // {
-    //     return Product::PRODUCTS[$id-1];
-    // }
-
     public static function all()
     {
-        //TODO 
+        return Product::PRODUCTS;
     }
-
+    
     public static function find($id)
     {
-        //TODO 
+        return Product::PRODUCTS[$id-1];
     }
+
+    // public static function all()
+    // {
+    //     //TODO 
+    // }
+
+    // public static function find($id)
+    // {
+    //     //TODO 
+    // }
 
     public function insert()
     {
