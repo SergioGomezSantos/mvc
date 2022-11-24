@@ -13,7 +13,7 @@ function redirectHome()
 {
     echo "
         <div>
-            <a href='/Product'>Home</a>
+            <a href='/Product'>Index</a>
         </div>
     ";
 }

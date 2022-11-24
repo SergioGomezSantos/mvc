@@ -17,8 +17,10 @@
     <div>
         <table>
             <tr>
-                <td><b>Identificador</b></td>
-                <td><b>Descripcion</b></td>
+                <td><b>Id</b></td>
+                <td><b>Name</b></td>
+                <td><b>Price</b></td>
+                <td><b>Fecha_Compra</b></td>
             </tr>
 
             <?php
@@ -27,13 +29,19 @@
 
                 if ($product) {
 
-                    echo "<td>$product[0]</td>";
-                    echo "<td>$product[1]</td>";
+                    echo "<tr>";
+                    echo "<td>". $product->id . "</td>";
+                    echo "<td>". $product->name . "</td>";
+                    echo "<td>". $product->price . "</td>";
+                    echo "<td>". $product->fecha_compra . "</td>";
+                    echo "</tr>";
 
                 } else {
 
                     echo "<td>#</td>";
-                    echo "<td>Sin Producto</td>";
+                    echo "<td>#</td>";
+                    echo "<td>#</td>";
+                    echo "<td>#</td>";
                 }
                 
                 echo "</tr>";

@@ -7,12 +7,11 @@ use Core\Model;
 
 class Product extends Model {
 
-    const PRODUCTS = [
-        array(1, 'Product A'),
-        array(2, 'Product B'),
-        array(3, 'Product C'),
-        array(4, 'Product D')
-    ];
+    public $id;
+    public $name;
+    public $type_id;
+    public $price;
+    public $fecha_compra;
 
     function __construct()
     {
@@ -21,23 +20,23 @@ class Product extends Model {
 
     public static function all()
     {
-        return Product::PRODUCTS;
+        $db = Product::db();
+        $statement = $db->query("SELECT * FROM products");
+        $products = $statement->fetchAll(PDO::FETCH_CLASS, Product::class);
+
+        return $products;
     }
-    
+
     public static function find($id)
     {
-        return Product::PRODUCTS[$id-1];
+        $db = Product::db();
+        $statement = $db->prepare('SELECT * FROM products WHERE id = :id');
+        $statement->execute(array(':id' => $id));
+        $statement->setFetchMode(PDO::FETCH_CLASS, Product::class);
+        $product = $statement->fetch(PDO::FETCH_CLASS);
+
+        return $product;
     }
-
-    // public static function all()
-    // {
-    //     //TODO 
-    // }
-
-    // public static function find($id)
-    // {
-    //     //TODO 
-    // }
 
     public function insert()
     {
