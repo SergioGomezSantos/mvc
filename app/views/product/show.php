@@ -33,7 +33,7 @@
                     echo "<td>". $product->id . "</td>";
                     echo "<td>". $product->name . "</td>";
                     echo "<td>". $product->price . "</td>";
-                    echo "<td>". $product->fecha_compra . "</td>";
+                    echo "<td>". $product->fecha_compra->format('d-m-Y') . "</td>";
                     echo "</tr>";
 
                 } else {

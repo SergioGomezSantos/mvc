@@ -1,10 +1,10 @@
 <?php
 
-function redirectShow()
+function fromIndex()
 {
     echo "
         <div>
-            <a href='Product/Show'>Show</a>
+            <a href='Product/Show/1'>Show</a> | <a href='Product/Create'>Create</a>
         </div>
     ";
 }
